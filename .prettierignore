@@ -1,0 +1,8 @@
+node_modules
+coverage
+.clinic
+prisma
+*.yml
+*.json
+dist
+README.md
