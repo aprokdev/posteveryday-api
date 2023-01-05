@@ -1,4 +1,7 @@
+import 'reflect-metadata';
 import { App } from './app';
+import InversifyContainer from './inversify.config';
+import TYPES from './inversify.types';
 
-const app = new App();
+const app = InversifyContainer.get<App>(TYPES.IApp);
 app.init();
