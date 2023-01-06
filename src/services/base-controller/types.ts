@@ -8,3 +8,9 @@ export interface Route {
     middlewares?: Array<(req: Request, res: Response, next: NextFunction) => void>;
     func: (req: Request, res: Response, next: NextFunction) => void;
 }
+
+export interface IBaseController {
+    router: Router;
+    sendOK: (res: Response, data: { message: string }) => ExtressReturnType;
+    bindRoutes: (routes: Route[]) => void;
+}
