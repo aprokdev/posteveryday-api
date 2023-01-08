@@ -11,15 +11,17 @@ export abstract class BaseController implements IBaseController {
         this.router = Router();
     }
 
-    public sendOK(res: Response, data: { message: string }): ExtressReturnType {
-        return res.send(200).send(data);
-    }
+    // public sendOK(res: Response, code: number, json: string): ExtressReturnType {
+    //     return res.send(code).send(json);
+    // }
 
     bindRoutes(routes: Route[]): void {
         for (const route of routes) {
             this.logger.info(`route '${route.path}' [${route.method}] has been added`);
             const handler = route.func.bind(this);
-            const pipeline = route.middlewares ? [...route.middlewares, handler] : handler;
+            const pipeline = route.middlewares
+                ? [...route.middlewares.map((m) => m.execute.bind(m)), handler]
+                : handler;
             this.router[route.method](route.path, pipeline);
         }
     }

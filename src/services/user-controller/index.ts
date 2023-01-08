@@ -19,10 +19,20 @@ export class UserController extends BaseController implements IUserController {
     }
 
     register(req: Request, res: Response, next: NextFunction): void {
-        this.logger.error('YES');
-        res.type('application/json');
-        const userData = req.body;
-        this.logger.info(userData);
-        res.json(userData);
+        const body = req.body;
+        this.logger.warn(body);
+        res.json({ ...body, status: 'ok' });
+    }
+
+    login(req: Request, res: Response, next: NextFunction): void {
+        const body = req.body;
+        this.logger.info(body);
+        res.json({ ...body, status: 'ok' });
+    }
+
+    info(req: Request, res: Response, next: NextFunction): void {
+        const body = req.body;
+        this.logger.info(body);
+        res.json(body);
     }
 }

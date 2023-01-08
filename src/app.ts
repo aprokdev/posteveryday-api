@@ -29,10 +29,10 @@ export class App implements IApp {
     }
 
     init(): void {
+        this.applyMiddlewares();
+        this.applyControllers();
         this.app.listen(this.port, () => {
             this.logger.info(`Server has been started on https://localhost:${this.port}`);
         });
-        this.applyMiddlewares();
-        this.applyControllers();
     }
 }
