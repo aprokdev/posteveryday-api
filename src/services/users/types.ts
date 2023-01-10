@@ -1,6 +1,6 @@
 import { User } from '@prisma/client';
 import { UserRegisterDTO } from './dto';
 
-export interface IUserRepository {
+export interface IUsers {
     create: (user: UserRegisterDTO) => Promise<User>;
 }

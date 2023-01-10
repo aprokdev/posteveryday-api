@@ -3,14 +3,14 @@ import { inject, injectable } from 'inversify';
 import TYPES from '../../inversify.types';
 import { BaseController } from '../base-controller';
 import { ILogger } from '../logger/types';
-import { IUserRepository } from '../user-repository/types';
+import { IUsers } from '../users/types';
 import { IUserController } from './types';
 
 @injectable()
 export class UserController extends BaseController implements IUserController {
     constructor(
         @inject(TYPES.ILogger) public logger: ILogger,
-        @inject(TYPES.IUserRepository) public userRepository: IUserRepository,
+        @inject(TYPES.IUsers) public users: IUsers,
     ) {
         super(logger);
         this.bindRoutes([
@@ -25,7 +25,7 @@ export class UserController extends BaseController implements IUserController {
     async register({ body }: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             this.logger.warn(body);
-            const result = await this.userRepository.create(body);
+            const result = await this.users.create(body);
             this.logger.info(`user ${result.first_name} ${result.last_name} created`);
             res.status(200).json({ success: true });
         } catch (error: any) {

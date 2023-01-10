@@ -3,7 +3,7 @@ export const TYPES = {
     ILogger: Symbol('Logger'),
     IErrorFilter: Symbol('IErrorFilter'),
     IUserController: Symbol('IUserController'),
-    IUserRepository: Symbol('IUserRepository'),
+    IUsers: Symbol('IUsers'),
     IDatabase: Symbol('IDatabase'),
     IENVConfig: Symbol('IENVConfig'),
 };

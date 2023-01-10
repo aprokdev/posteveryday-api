@@ -16,4 +16,8 @@ export class ENVConfig implements IENVConfig {
             this.config = result.parsed as DotenvParseOutput;
         }
     }
+
+    get(key: string): string | undefined {
+        return this.config[key];
+    }
 }
