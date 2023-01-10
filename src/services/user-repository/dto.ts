@@ -9,11 +9,11 @@ export class UserRegisterDTO {
 
     @MinLength(2, { message: 'Firstname is too short' })
     @IsString({ message: 'Should be string not number' })
-    firstName: string;
+    first_name: string;
 
     @MinLength(2, { message: 'Lastname is too short' })
     @IsString({ message: 'Should be string not number' })
-    lastName: string;
+    last_name: string;
 }
 
 export class UserLoginDTO {

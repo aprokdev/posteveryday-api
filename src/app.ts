@@ -1,6 +1,7 @@
 import express from 'express';
 import { inject, injectable } from 'inversify';
 import TYPES from './inversify.types';
+import { IDatabase } from './services/database/types';
 import { IErrorFilter } from './services/error-filter/types';
 import { ILogger } from './services/logger/types';
 import { IUserController } from './services/user-controller/types';
@@ -14,6 +15,7 @@ export class App implements IApp {
         @inject(TYPES.ILogger) public logger: ILogger,
         @inject(TYPES.IErrorFilter) public errorFilter: IErrorFilter,
         @inject(TYPES.IUserController) public userController: IUserController,
+        @inject(TYPES.IDatabase) public database: IDatabase,
     ) {
         this.app = express();
         this.port = 8000;
@@ -31,6 +33,7 @@ export class App implements IApp {
     init(): void {
         this.applyMiddlewares();
         this.applyControllers();
+        this.database.connect();
         this.app.listen(this.port, () => {
             this.logger.info(`Server has been started on https://localhost:${this.port}`);
         });
