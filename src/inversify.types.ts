@@ -5,6 +5,7 @@ export const TYPES = {
     IUserController: Symbol('IUserController'),
     IUserRepository: Symbol('IUserRepository'),
     IDatabase: Symbol('IDatabase'),
+    IENVConfig: Symbol('IENVConfig'),
 };
 
 export default TYPES;

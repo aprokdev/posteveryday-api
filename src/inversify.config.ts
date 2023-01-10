@@ -3,6 +3,8 @@ import { App } from './app';
 import TYPES from './inversify.types';
 import { Database } from './services/database';
 import { IDatabase } from './services/database/types';
+import { ENVConfig } from './services/env-config';
+import { IENVConfig } from './services/env-config/types';
 import { ErrorFilter } from './services/error-filter';
 import { IErrorFilter } from './services/error-filter/types';
 import { LoggerService } from './services/logger';
@@ -21,5 +23,6 @@ InversifyContainer.bind<IErrorFilter>(TYPES.IErrorFilter).to(ErrorFilter);
 InversifyContainer.bind<IUserController>(TYPES.IUserController).to(UserController);
 InversifyContainer.bind<IUserRepository>(TYPES.IUserRepository).to(UserRepository);
 InversifyContainer.bind<IDatabase>(TYPES.IDatabase).to(Database);
+InversifyContainer.bind<IENVConfig>(TYPES.IENVConfig).to(ENVConfig);
 
 export default InversifyContainer;

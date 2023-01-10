@@ -2,6 +2,7 @@ import express from 'express';
 import { inject, injectable } from 'inversify';
 import TYPES from './inversify.types';
 import { IDatabase } from './services/database/types';
+import { IENVConfig } from './services/env-config/types';
 import { IErrorFilter } from './services/error-filter/types';
 import { ILogger } from './services/logger/types';
 import { IUserController } from './services/user-controller/types';
@@ -16,6 +17,7 @@ export class App implements IApp {
         @inject(TYPES.IErrorFilter) public errorFilter: IErrorFilter,
         @inject(TYPES.IUserController) public userController: IUserController,
         @inject(TYPES.IDatabase) public database: IDatabase,
+        @inject(TYPES.IENVConfig) public envConfig: IENVConfig,
     ) {
         this.app = express();
         this.port = 8000;

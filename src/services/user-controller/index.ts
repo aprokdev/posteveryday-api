@@ -22,9 +22,8 @@ export class UserController extends BaseController implements IUserController {
         ]);
     }
 
-    async register(req: Request, res: Response, next: NextFunction): Promise<void> {
+    async register({ body }: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const body = req.body;
             this.logger.warn(body);
             const result = await this.userRepository.create(body);
             this.logger.info(`user ${result.first_name} ${result.last_name} created`);
@@ -35,13 +34,13 @@ export class UserController extends BaseController implements IUserController {
         }
     }
 
-    login(req: Request, res: Response, next: NextFunction): void {
+    async login(req: Request, res: Response, next: NextFunction): Promise<void> {
         const body = req.body;
         this.logger.info(body);
         res.json({ ...body, status: 'ok' });
     }
 
-    info(req: Request, res: Response, next: NextFunction): void {
+    async info(req: Request, res: Response, next: NextFunction): Promise<void> {
         const body = req.body;
         this.logger.info(body);
         res.json(body);
