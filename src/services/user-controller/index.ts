@@ -26,8 +26,8 @@ export class UserController extends BaseController implements IUserController {
         try {
             this.logger.warn(body);
             const result = await this.users.create(body);
-            this.logger.info(`user ${result.first_name} ${result.last_name} created`);
-            res.status(200).json({ success: true });
+            this.logger.info(`user created: [${result}]`);
+            res.status(200).json({ success: result });
         } catch (error: any) {
             this.logger.error(error.message);
             next();
