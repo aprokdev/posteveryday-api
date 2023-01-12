@@ -1,10 +1,11 @@
 import { User } from '@prisma/client';
 import { inject, injectable } from 'inversify';
+import { HTTPError } from '../../errors';
 import TYPES from '../../inversify.types';
 import { IDatabase } from '../database/types';
 import { IENVConfig } from '../env-config/types';
 import { ILogger } from '../logger/types';
-import { UserRegisterDTO } from './dto';
+import { UserLoginDTO, UserRegisterDTO } from './dto';
 import { IUsers } from './types';
 import { UserEntity } from './user-entity';
 
@@ -16,29 +17,39 @@ export class Users implements IUsers {
         @inject(TYPES.ILogger) public logger: ILogger,
     ) {}
 
-    // async validateUser(user: UserRegisterDTO): Promise<void> {}
-
     async findByEmail(email: string): Promise<User | null> {
-        return this.database.prisma.user.findUnique({
+        return this.database.prismaClient.user.findUnique({
             where: { email },
         });
     }
 
-    async create({ email, first_name, last_name, password }: UserRegisterDTO): Promise<boolean> {
-        const salt = Number(this.envConfig.get('SALT'));
-        const user = new UserEntity({ email, first_name, last_name });
-        await user.setPassword(password, salt);
+    async validateUser({ email, password }: UserLoginDTO): Promise<boolean> {
+        const existedUser = await this.findByEmail(email);
+        if (!existedUser) {
+            throw new HTTPError(401, 'There is no user with provided email');
+        }
+        return await UserEntity.comparePassword(password, existedUser.password);
+    }
 
+    async create({ email, first_name, last_name, password }: UserRegisterDTO): Promise<boolean> {
+        // check if user already exist:
         const existedUser = await this.findByEmail(email);
         if (existedUser) {
-            this.logger.error(`[email] Email already exists`);
+            this.logger.error(`Email [${email}] already exists`);
             return false;
         }
 
-        await this.database.prisma.user.create({
-            data: user,
-        });
+        const salt = this.envConfig.get('SALT');
+        if (salt) {
+            const user = new UserEntity({ email, first_name, last_name });
+            await user.setPassword(password, Number(salt));
 
-        return true;
+            await this.database.prismaClient.user.create({
+                data: user,
+            });
+
+            return true;
+        }
+        throw new Error("Unable to get 'SALT' property from .env");
     }
 }

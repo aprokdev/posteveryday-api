@@ -1,7 +1,7 @@
 import { PrismaClient } from '.prisma/client';
 
 export interface IDatabase {
-    prisma: PrismaClient;
+    prismaClient: PrismaClient;
     connect: () => void;
     disconnect: () => void;
 }

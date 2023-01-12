@@ -1,6 +1,4 @@
 import { compare, hash } from 'bcryptjs';
-import { IENVConfig } from '../env-config/types';
-import { ILogger } from '../logger/types';
 import { IUserEntity } from './types';
 
 export interface IBody {
@@ -25,7 +23,7 @@ export class UserEntity implements IUserEntity {
         this.password = await hash(password, salt);
     }
 
-    async validatePassword(password: string): Promise<boolean> {
-        return true;
+    static async comparePassword(password: string, passwordHash: string): Promise<boolean> {
+        return await compare(password, passwordHash);
     }
 }

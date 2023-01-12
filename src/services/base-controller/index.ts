@@ -17,7 +17,7 @@ export abstract class BaseController implements IBaseController {
 
     bindRoutes(routes: Route[]): void {
         for (const route of routes) {
-            this.logger.info(`route '${route.path}' [${route.method}] has been added`);
+            this.logger.info(`[${route.method}] route '${route.path}' has been added`);
             const handler = route.func.bind(this);
             const pipeline = route.middlewares
                 ? [...route.middlewares.map((m) => m.execute.bind(m)), handler]

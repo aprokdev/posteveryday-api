@@ -4,16 +4,16 @@ import { IDatabase } from './types';
 
 @injectable()
 export class Database implements IDatabase {
-    public prisma: PrismaClient;
+    public prismaClient: PrismaClient;
     constructor() {
-        this.prisma = new PrismaClient();
+        this.prismaClient = new PrismaClient();
     }
 
     connect(): void {
-        this.prisma.$connect();
+        this.prismaClient.$connect();
     }
 
     disconnect(): void {
-        this.prisma.$disconnect();
+        this.prismaClient.$disconnect();
     }
 }

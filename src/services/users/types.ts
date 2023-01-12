@@ -1,9 +1,10 @@
 import { User } from '@prisma/client';
-import { UserRegisterDTO } from './dto';
+import { UserLoginDTO, UserRegisterDTO } from './dto';
 
 export interface IUsers {
     findByEmail: (email: string) => Promise<User | null>;
     create: (user: UserRegisterDTO) => Promise<boolean>;
+    validateUser: (user: UserLoginDTO) => Promise<boolean>;
 }
 
 export interface IUserEntity {
@@ -12,5 +13,4 @@ export interface IUserEntity {
     last_name: string;
     password: string;
     setPassword: (password: string, salt: number) => Promise<void>;
-    validatePassword: (password: string) => Promise<boolean>;
 }

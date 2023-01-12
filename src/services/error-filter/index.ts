@@ -16,7 +16,7 @@ export class ErrorFilter implements IErrorFilter {
             res.status(error.statusCode).send({ error: error.message });
             return;
         }
-        this.logger.error(`Error ${error.message}`);
+        this.logger.error(`[ErrorFilter]: ${error.message}`);
         res.status(500).send({ error: error.message });
     }
 }
