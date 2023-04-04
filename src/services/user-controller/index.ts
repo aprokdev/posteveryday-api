@@ -31,13 +31,13 @@ export class UserController extends BaseController implements IUserController {
         ]);
     }
 
-    async register({ body }: Request, res: Response, next: NextFunction): Promise<void> {
+    async register({ body }: Request, res: Response): Promise<void> {
         try {
-            const result = await this.users.create(body);
-            res.status(200).json({ success: result });
+            await this.users.create(body);
+            res.status(201).json({ success: true });
         } catch (error: any) {
             this.logger.error(error.message);
-            res.status(500).json({ message: error.message });
+            res.status(error.statusCode || 500).json({ message: error.message });
         }
     }
 

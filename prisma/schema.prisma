@@ -15,5 +15,24 @@ model User {
   email      String @unique
   first_name String
   last_name  String
-  password   String
+  hash       String
+  salt       String
+  image      String
+  role       String
+  Post       Post[]
+
+  @@unique([id, first_name, last_name])
+}
+
+model Post {
+  id               Int      @id @default(autoincrement())
+  title            String
+  image            String
+  html             String   @db.Text
+  html_preview     String   @db.Text
+  created          DateTime @default(now())
+  author_id        Int
+  author_firstname String
+  author_lastname  String
+  author           User     @relation(fields: [author_id, author_firstname, author_lastname], references: [id, first_name, last_name])
 }
