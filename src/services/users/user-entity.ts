@@ -1,4 +1,4 @@
-import { HTTPError } from '@errors/index';
+import { HTTPError422 } from '@errors/index';
 import crypto from 'crypto';
 import { IRegisterUserBody, IUserEntity } from './types';
 
@@ -13,8 +13,7 @@ export class UserEntity implements IUserEntity {
 
     constructor({ email, first_name, last_name, password }: IRegisterUserBody) {
         if (!email || !first_name || !last_name || !password) {
-            throw new HTTPError(
-                422,
+            throw new HTTPError422(
                 'body should contain email, first_name, last_name, password fields',
             );
         }

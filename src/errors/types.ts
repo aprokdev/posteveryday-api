@@ -1,5 +1,5 @@
 export interface IHTTPError {
-    statusCode: number;
+    status: number;
     message: string;
     context?: string;
 }

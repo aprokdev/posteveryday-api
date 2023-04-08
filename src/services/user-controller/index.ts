@@ -1,6 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
-import { HTTPError } from '../../errors';
+import { HTTPError422 } from '../../errors';
 import TYPES from '../../inversify.types';
 import { BaseController } from '../base-controller';
 import { IENVConfig } from '../env-config/types';
@@ -44,7 +44,7 @@ export class UserController extends BaseController implements IUserController {
         try {
             const isUserValid = await this.users.validateUser(body);
             if (!isUserValid) {
-                throw new HTTPError(422, 'Provided credentials are invalid');
+                throw new HTTPError422('Provided credentials are invalid');
             }
             const jwt = await this.users.signToken(body.email);
             res.status(200).json({ success: true, jwt });

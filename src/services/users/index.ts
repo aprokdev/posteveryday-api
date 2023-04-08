@@ -1,8 +1,8 @@
-import { HTTPError } from '@errors/index';
+import { HTTPError, HTTPError422 } from '@errors/index';
 import { IDatabase } from '@services/database/types';
 import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
-import { IUser, genPassword, validatePassword } from '@utils/user-entity';
+import { IUser, validatePassword } from '@utils/user-entity';
 import { inject, injectable } from 'inversify';
 import TYPES from 'inversify.types';
 import { sign } from 'jsonwebtoken';
@@ -26,11 +26,11 @@ export class Users implements IUsers {
 
     async validateUser({ email, password }: UserLoginDTO): Promise<boolean> {
         if (!email || !password) {
-            throw new HTTPError(422, '"email" and "password" fields are required');
+            throw new HTTPError422('"email" and "password" fields are required');
         }
         const existedUser = await this.findByEmail(email);
         if (!existedUser) {
-            throw new HTTPError(422, 'Provided credentials are invalid');
+            throw new HTTPError422('Provided credentials are invalid');
         }
         return validatePassword(password, existedUser.hash, existedUser.salt);
     }
@@ -39,7 +39,7 @@ export class Users implements IUsers {
         // check if user already exist:
         const existedUser = await this.findByEmail(body.email);
         if (existedUser) {
-            throw new HTTPError(422, 'User with provided email is already exist');
+            throw new HTTPError422('User with provided email is already exist');
         }
         const newUser = new UserEntity(body);
         return await this.database.prismaClient.user.create({ data: newUser });
