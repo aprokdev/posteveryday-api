@@ -1,6 +1,5 @@
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
-import { sign } from 'jsonwebtoken';
 import { HTTPError } from '../../errors';
 import TYPES from '../../inversify.types';
 import { BaseController } from '../base-controller';
@@ -37,7 +36,7 @@ export class UserController extends BaseController implements IUserController {
             res.status(201).json({ success: true });
         } catch (error: any) {
             this.logger.error(error.message);
-            res.status(error.statusCode || 500).json({ message: error.message });
+            res.status(error.statusCode || 500).json({ success: false, message: error.message });
         }
     }
 
@@ -45,32 +44,17 @@ export class UserController extends BaseController implements IUserController {
         try {
             const isUserValid = await this.users.validateUser(body);
             if (!isUserValid) {
-                const message = "Provided password doesn't match";
-                this.logger.error(message);
-                res.status(401).json({ message });
+                throw new HTTPError(422, 'Provided credentials are invalid');
             }
-            const secret = this.envConfig.get('SECRET');
-
-            if (!secret) {
-                throw new Error('secret is absent in .env file');
-            }
-            if (secret) {
-                const jwt = await sign(body.email, secret, { algorithm: 'HS256' });
-                res.status(200).json({ success: true, jwt });
-            }
-            next();
+            const jwt = await this.users.signToken(body.email);
+            res.status(200).json({ success: true, jwt });
         } catch (error: any) {
             this.logger.error(error.message);
-            if (error instanceof HTTPError) {
-                res.status(error.statusCode).json({ message: error.message });
-                return;
-            }
-            res.status(500).json({ message: error.message });
+            res.status(error.statusCode || 500).json({ success: false, message: error.message });
         }
     }
 
-    async info(req: Request, res: Response, next: NextFunction): Promise<void> {
-        const body = req.body;
+    async info({ body }: Request, res: Response, next: NextFunction): Promise<void> {
         this.logger.info(body);
         res.json(body);
     }

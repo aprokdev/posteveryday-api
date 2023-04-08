@@ -1,29 +1,30 @@
-import { compare, hash } from 'bcryptjs';
-import { IUserEntity } from './types';
-
-export interface IBody {
-    email: string;
-    first_name: string;
-    last_name: string;
-}
+import { HTTPError } from '@errors/index';
+import crypto from 'crypto';
+import { IRegisterUserBody, IUserEntity } from './types';
 
 export class UserEntity implements IUserEntity {
     public email: string;
     public first_name: string;
     public last_name: string;
-    public password: string;
+    public hash: string;
+    public salt: string;
+    public role: 'user' | 'admin';
+    public image: string;
 
-    constructor({ email, first_name, last_name }: IBody) {
+    constructor({ email, first_name, last_name, password }: IRegisterUserBody) {
+        if (!email || !first_name || !last_name || !password) {
+            throw new HTTPError(
+                422,
+                'body should contain email, first_name, last_name, password fields',
+            );
+        }
+
         this.email = email;
         this.first_name = first_name;
         this.last_name = last_name;
-    }
-
-    async setPassword(password: string, salt: number): Promise<void> {
-        this.password = await hash(password, salt);
-    }
-
-    static async comparePassword(password: string, passwordHash: string): Promise<boolean> {
-        return await compare(password, passwordHash);
+        this.salt = crypto.randomBytes(32).toString('hex');
+        this.hash = crypto.pbkdf2Sync(password, this.salt, 10000, 64, 'sha512').toString('hex');
+        this.role = 'user';
+        this.image = '';
     }
 }
