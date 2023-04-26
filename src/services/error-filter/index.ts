@@ -12,8 +12,8 @@ export class ErrorFilter implements IErrorFilter {
 
     execute(error: Error | IHTTPError, req: Request, res: Response, next: NextFunction): void {
         if (error instanceof HTTPError) {
-            this.logger.error(`[${error.context}] Error ${error.statusCode} ${error.message}`);
-            res.status(error.statusCode).send({ error: error.message });
+            this.logger.error(`[${error.context}] Error ${error.status} ${error.message}`);
+            res.status(error.status).send({ error: error.message });
             return;
         }
         this.logger.error(`[ErrorFilter]: ${error.message}`);

@@ -9,9 +9,9 @@ import { ErrorFilter } from './services/error-filter';
 import { IErrorFilter } from './services/error-filter/types';
 import { LoggerService } from './services/logger';
 import { ILogger } from './services/logger/types';
-import { UserController } from './services/user-controller';
-import { IUserController } from './services/user-controller/types';
 import { Users } from './services/users';
+import { UserController } from './services/users-controller';
+import { IUserController } from './services/users-controller/types';
 import { IUsers } from './services/users/types';
 import { IApp } from './types';
 

@@ -5,7 +5,7 @@ import { IDatabase } from './services/database/types';
 import { IENVConfig } from './services/env-config/types';
 import { IErrorFilter } from './services/error-filter/types';
 import { ILogger } from './services/logger/types';
-import { IUserController } from './services/user-controller/types';
+import { IUsersController } from './services/users-controller/types';
 import { IApp } from './types';
 
 @injectable()
@@ -15,7 +15,7 @@ export class App implements IApp {
     constructor(
         @inject(TYPES.ILogger) public logger: ILogger,
         @inject(TYPES.IErrorFilter) public errorFilter: IErrorFilter,
-        @inject(TYPES.IUserController) public userController: IUserController,
+        @inject(TYPES.IUserController) public userController: IUsersController,
         @inject(TYPES.IDatabase) public database: IDatabase,
         @inject(TYPES.IENVConfig) public envConfig: IENVConfig,
     ) {
@@ -29,7 +29,7 @@ export class App implements IApp {
     }
 
     applyControllers(): void {
-        this.app.use('/user', this.userController.router);
+        this.app.use('/users', this.userController.router);
     }
 
     init(): void {

@@ -1,14 +1,14 @@
-import { HTTPError, HTTPError422 } from '@errors/index';
+import { HTTPError422 } from '@errors/index';
 import { IDatabase } from '@services/database/types';
 import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
-import { IUser, validatePassword } from '@utils/user-entity';
+import { validatePassword } from '@services/users/user-entity';
+import { UserEntity } from '@services/users/user-entity';
 import { inject, injectable } from 'inversify';
 import TYPES from 'inversify.types';
 import { sign } from 'jsonwebtoken';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
-import { IUsers } from './types';
-import { UserEntity } from './user-entity';
+import { IUser, IUsers } from './types';
 
 @injectable()
 export class Users implements IUsers {
@@ -19,7 +19,7 @@ export class Users implements IUsers {
     ) {}
 
     async findByEmail(email: string): Promise<IUser | null> {
-        return this.database.prismaClient.user.findUnique({
+        return await this.database.prismaClient.user.findUnique({
             where: { email },
         });
     }

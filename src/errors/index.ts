@@ -4,11 +4,17 @@ export class HTTPError extends Error implements IHTTPError {
     constructor(public status: number, public message: string, public context?: string) {
         super(message);
     }
-    statusCode: number;
 }
 
 export class HTTPError401 extends Error implements IHTTPError {
     status = 401;
+    constructor(public message: string, public context?: string) {
+        super(message);
+    }
+}
+
+export class HTTPError404 extends Error implements IHTTPError {
+    status = 404;
     constructor(public message: string, public context?: string) {
         super(message);
     }

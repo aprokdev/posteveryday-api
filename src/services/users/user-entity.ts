@@ -1,6 +1,17 @@
 import { HTTPError422 } from '@errors/index';
 import crypto from 'crypto';
-import { IRegisterUserBody, IUserEntity } from './types';
+import { IRegisterUserBody, IUserEntity, hashedPasswordData } from './types';
+
+export function validatePassword(password: string, hash: string, salt: string): boolean {
+    const hashVerify = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+    return hash === hashVerify;
+}
+
+export function genPassword(password: string): hashedPasswordData {
+    const salt = crypto.randomBytes(32).toString('hex');
+    const hash = crypto.pbkdf2Sync(password, salt, 10000, 64, 'sha512').toString('hex');
+    return { salt, hash };
+}
 
 export class UserEntity implements IUserEntity {
     public email: string;

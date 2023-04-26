@@ -1,15 +1,15 @@
+import { HTTPError, HTTPError404, HTTPError422 } from '@errors/index';
+import { BaseController } from '@services/base-controller';
+import { IENVConfig } from '@services/env-config/types';
+import { ILogger } from '@services/logger/types';
+import { IUsers } from '@services/users/types';
+import TYPES from '@src/inversify.types';
 import { NextFunction, Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
-import { HTTPError422 } from '../../errors';
-import TYPES from '../../inversify.types';
-import { BaseController } from '../base-controller';
-import { IENVConfig } from '../env-config/types';
-import { ILogger } from '../logger/types';
-import { IUsers } from '../users/types';
-import { IUserController } from './types';
+import { IUsersController } from './types';
 
 @injectable()
-export class UserController extends BaseController implements IUserController {
+export class UsersController extends BaseController implements IUsersController {
     constructor(
         @inject(TYPES.ILogger) public logger: ILogger,
         @inject(TYPES.IUsers) public users: IUsers,
@@ -27,7 +27,17 @@ export class UserController extends BaseController implements IUserController {
                 func: this.login,
                 method: 'post',
             },
+            {
+                path: '/',
+                func: this.info,
+                method: 'get',
+            },
         ]);
+    }
+
+    errorHandler(error: HTTPError, res: Response): void {
+        this.logger.error(error.message);
+        res.status(error?.status || 500).json({ success: false, message: error.message });
     }
 
     async register({ body }: Request, res: Response): Promise<void> {
@@ -35,8 +45,7 @@ export class UserController extends BaseController implements IUserController {
             await this.users.create(body);
             res.status(201).json({ success: true });
         } catch (error: any) {
-            this.logger.error(error.message);
-            res.status(error.statusCode || 500).json({ success: false, message: error.message });
+            this.errorHandler(error, res);
         }
     }
 
@@ -49,13 +58,22 @@ export class UserController extends BaseController implements IUserController {
             const jwt = await this.users.signToken(body.email);
             res.status(200).json({ success: true, jwt });
         } catch (error: any) {
-            this.logger.error(error.message);
-            res.status(error.statusCode || 500).json({ success: false, message: error.message });
+            this.errorHandler(error, res);
         }
     }
 
     async info({ body }: Request, res: Response, next: NextFunction): Promise<void> {
-        this.logger.info(body);
-        res.json(body);
+        try {
+            const user = await this.users.findByEmail(body.email);
+            if (user) {
+                const { hash, salt, ...rest } = user;
+                this.logger.info(rest);
+                res.json(rest);
+            } else {
+                throw new HTTPError404('User is not found');
+            }
+        } catch (error: any) {
+            this.errorHandler(error, res);
+        }
     }
 }

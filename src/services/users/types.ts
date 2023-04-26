@@ -1,5 +1,4 @@
 import { User } from '@prisma/client';
-import { IUser } from '../../utils/user-entity';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
 
 export interface IUsers {
@@ -23,5 +22,21 @@ export interface IUserEntity {
     salt: string;
     hash: string;
     role: 'user' | 'admin';
+    image: string;
+}
+
+export type hashedPasswordData = {
+    salt: string;
+    hash: string;
+};
+
+export interface IUser {
+    id: number;
+    email: string;
+    first_name: string;
+    last_name: string;
+    hash: string;
+    salt: string;
+    role: string;
     image: string;
 }
