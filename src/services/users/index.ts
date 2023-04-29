@@ -14,7 +14,7 @@ import { IUser, IUsers } from './types';
 export class Users implements IUsers {
     constructor(
         @inject(TYPES.IDatabase) public database: IDatabase,
-        @inject(TYPES.IENVConfig) public envConfig: IENVConfig,
+        @inject(TYPES.IENVConfig) public env: IENVConfig,
         @inject(TYPES.ILogger) public logger: ILogger,
     ) {}
 
@@ -46,7 +46,7 @@ export class Users implements IUsers {
     }
 
     async signToken(email: string): Promise<string> {
-        const secret = this.envConfig.get('TOKEN_SECRET');
+        const secret = this.env.get('TOKEN_SECRET');
         if (!secret) {
             throw new Error('TOKEN_SECRET is absent in .env file');
         } else {

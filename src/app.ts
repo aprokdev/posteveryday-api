@@ -17,7 +17,7 @@ export class App implements IApp {
         @inject(TYPES.IErrorFilter) public errorFilter: IErrorFilter,
         @inject(TYPES.IUserController) public userController: IUsersController,
         @inject(TYPES.IDatabase) public database: IDatabase,
-        @inject(TYPES.IENVConfig) public envConfig: IENVConfig,
+        @inject(TYPES.IENVConfig) public env: IENVConfig,
     ) {
         this.app = express();
         this.port = 8000;

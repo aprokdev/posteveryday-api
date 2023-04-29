@@ -6,18 +6,18 @@ import { IENVConfig } from './types';
 
 @injectable()
 export class ENVConfig implements IENVConfig {
-    public config: DotenvParseOutput;
+    public instance: DotenvParseOutput;
     constructor(@inject(TYPES.ILogger) private logger: ILogger) {
         const result: DotenvConfigOutput = config();
         if (result.error) {
             this.logger.error("[ConfigService] Can't read .env file");
         } else {
             this.logger.info('[ConfigService] Config has been loaded');
-            this.config = result.parsed as DotenvParseOutput;
+            this.instance = result.parsed as DotenvParseOutput;
         }
     }
 
     get(key: string): string | undefined {
-        return this.config[key];
+        return this.instance[key];
     }
 }

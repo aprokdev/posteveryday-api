@@ -1,6 +1,5 @@
 import { HTTPError, HTTPError404, HTTPError422 } from '@errors/index';
 import { BaseController } from '@services/base-controller';
-import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
 import { IUsers } from '@services/users/types';
 import TYPES from '@src/inversify.types';
@@ -13,7 +12,6 @@ export class UsersController extends BaseController implements IUsersController 
     constructor(
         @inject(TYPES.ILogger) public logger: ILogger,
         @inject(TYPES.IUsers) public users: IUsers,
-        @inject(TYPES.IENVConfig) public envConfig: IENVConfig,
     ) {
         super(logger);
         this.bindRoutes([
