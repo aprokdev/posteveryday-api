@@ -1,5 +1,6 @@
 import { NextFunction, Request, Response } from 'express';
+import { IUserAuthInfoRequest } from './auth-middleware/types';
 
 export interface IMIddleware {
-    execute: (req: Request, res: Response, next: NextFunction) => void;
+    execute: (req: IUserAuthInfoRequest, res: Response, next: NextFunction) => void;
 }
