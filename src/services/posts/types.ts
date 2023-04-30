@@ -1,11 +1,6 @@
 import { Request } from 'express';
 
-export interface IPosts {
-    create: (data: IUserData) => Promise<IUserData>;
-    parseFieldsAndS3Upload: (req: Request) => Promise<IParseUploadResponse>;
-}
-
-export interface IUserData {
+export interface IPostData {
     title: string;
     html: string;
     html_preview: string;
@@ -13,6 +8,10 @@ export interface IUserData {
     author_id: number;
     author_firstname: string;
     author_lastname: string;
+}
+
+export interface IPosts {
+    create: (req: Request) => Promise<void>;
 }
 
 export interface IParseUploadResponse {

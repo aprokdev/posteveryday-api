@@ -22,15 +22,15 @@ export class LoggerService implements ILogger {
         });
     }
 
-    info(...args: unknown[]): void {
+    public info(...args: unknown[]): void {
         this._logger.info(...args);
     }
 
-    error(...args: unknown[]): void {
+    public error(...args: unknown[]): void {
         this._logger.error(...args);
     }
 
-    warn(...args: unknown[]): void {
+    public warn(...args: unknown[]): void {
         this._logger.warn(...args);
     }
 }

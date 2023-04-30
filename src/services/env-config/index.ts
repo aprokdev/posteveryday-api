@@ -17,7 +17,7 @@ export class ENVConfig implements IENVConfig {
         }
     }
 
-    get(key: string): string | undefined {
+    public get(key: string): string {
         return this.instance[key];
     }
 }

@@ -1,31 +1,38 @@
 import { Upload } from '@aws-sdk/lib-storage';
 import { IDatabase } from '@services/database/types';
+import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
 import busboy from 'busboy';
 import { Request } from 'express';
 import { inject, injectable } from 'inversify';
-import { IParseUploadResponse, IPosts, IUserData } from './types';
+import { IParseUploadResponse, IPostData, IPosts } from './types';
 
 @injectable()
 export class Posts implements IPosts {
     constructor(
-        @inject(TYPES.ILogger) public logger: ILogger,
-        @inject(TYPES.IDatabase) public database: IDatabase,
-        @inject(TYPES.IS3Client) public s3: IS3Client,
+        @inject(TYPES.IDatabase) private _db: IDatabase,
+        @inject(TYPES.IS3Client) private _s3: IS3Client,
+        @inject(TYPES.IENVConfig) private _env: IENVConfig,
     ) {}
 
-    async create(data: IUserData): Promise<IUserData> {
-        return await this.database.prismaClient.post.create({
-            data: {
-                ...data,
-                html_preview: data.html.slice(0, 340),
-            },
-        });
+    async create(req: Request): Promise<void> {
+        // const { title, html, imageURL: image } = await this._parseFieldsAndS3Upload(req);
+        // return await this._db.instance.post.create({
+        //     data: {
+        //         title,
+        //         html,
+        //         html_preview: html.slice(0, 340),
+        //         image,
+        //         // author_id: Number(session.id),
+        //         // author_firstname: session.first_name,
+        //         // author_lastname: session.last_name,
+        //     },
+        // });
     }
 
-    parseFieldsAndS3Upload(req: Request): Promise<IParseUploadResponse> {
+    private _parseFieldsAndS3Upload(req: Request): Promise<IParseUploadResponse> {
         return new Promise((res, rej) => {
             const bb = busboy({ headers: req.headers });
 
@@ -40,12 +47,12 @@ export class Posts implements IPosts {
 
                 try {
                     const params = {
-                        Bucket: process.env.AWS_S3_BUCKET_NAME,
+                        Bucket: this._env.get('AWS_S3_BUCKET_NAME'),
                         Key: `images/${new Date().toISOString().replace(/\.||-/g, '')}-${filename}`,
                         Body: file,
                     };
 
-                    const upload = new Upload({ client: this.s3.instance, params });
+                    const upload = new Upload({ client: this._s3.instance, params });
                     const { Location }: any = await upload.done();
                     res({ imageURL: Location, ...fields });
                 } catch (error) {

@@ -8,15 +8,12 @@ import { IS3Client } from './types';
 @injectable()
 export class S3Client implements IS3Client {
     public instance: Client;
-    constructor(
-        @inject(TYPES.ILogger) public logger: ILogger,
-        @inject(TYPES.IENVConfig) public env: IENVConfig,
-    ) {
+    constructor(@inject(TYPES.IENVConfig) private _env: IENVConfig) {
         this.instance = new Client({
             region: 'ca-central-1',
             credentials: {
-                accessKeyId: this.env.instance.AWS_ACCESS_KEY_ID,
-                secretAccessKey: this.env.instance.AWS_SECRET_ACCESS_KEY,
+                accessKeyId: this._env.instance.AWS_ACCESS_KEY_ID,
+                secretAccessKey: this._env.instance.AWS_SECRET_ACCESS_KEY,
             },
         });
     }

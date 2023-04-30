@@ -2,5 +2,5 @@ import { DotenvParseOutput } from 'dotenv';
 
 export interface IENVConfig {
     instance: DotenvParseOutput;
-    get: (key: string) => string | undefined;
+    get: (key: string) => string;
 }

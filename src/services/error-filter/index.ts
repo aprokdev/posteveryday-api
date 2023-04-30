@@ -8,15 +8,20 @@ import { IErrorFilter } from './types';
 
 @injectable()
 export class ErrorFilter implements IErrorFilter {
-    constructor(@inject(TYPES.ILogger) private logger: ILogger) {}
+    constructor(@inject(TYPES.ILogger) private _logger: ILogger) {}
 
-    execute(error: Error | IHTTPError, req: Request, res: Response, next: NextFunction): void {
+    public execute(
+        error: Error | IHTTPError,
+        req: Request,
+        res: Response,
+        next: NextFunction,
+    ): void {
         if (error instanceof HTTPError) {
-            this.logger.error(`[${error.context}] Error ${error.status} ${error.message}`);
+            this._logger.error(`[${error.context}] Error ${error.status} ${error.message}`);
             res.status(error.status).send({ error: error.message });
             return;
         }
-        this.logger.error(`[ErrorFilter]: ${error.message}`);
-        res.status(500).send({ error: error.message });
+        this._logger.error(`[ErrorFilter]: ${error.message}`);
+        res.status(500).send({ sucess: false, error: error.message });
     }
 }

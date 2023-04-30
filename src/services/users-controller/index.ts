@@ -1,4 +1,5 @@
 import { HTTPError, HTTPError404, HTTPError422 } from '@errors/index';
+// import { AuthGuard } from '@middlewares/auth-guard';
 import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
 import { IUsers } from '@services/users/types';
@@ -10,10 +11,10 @@ import { IUsersController } from './types';
 @injectable()
 export class UsersController extends BaseController implements IUsersController {
     constructor(
-        @inject(TYPES.ILogger) public logger: ILogger,
+        @inject(TYPES.ILogger) private _logger: ILogger,
         @inject(TYPES.IUsers) public users: IUsers,
     ) {
-        super(logger);
+        super(_logger);
         this.bindRoutes([
             {
                 path: '/register',
@@ -29,25 +30,26 @@ export class UsersController extends BaseController implements IUsersController 
                 path: '/',
                 func: this.info,
                 method: 'get',
+                // middlewares: [new AuthGuard()],
             },
         ]);
     }
 
-    errorHandler(error: HTTPError, res: Response): void {
-        this.logger.error(error.message);
+    private _errorHandler(error: HTTPError, res: Response): void {
+        this._logger.error(error.message);
         res.status(error?.status || 500).json({ success: false, message: error.message });
     }
 
-    async register({ body }: Request, res: Response): Promise<void> {
+    public async register({ body }: Request, res: Response): Promise<void> {
         try {
             await this.users.create(body);
             res.status(201).json({ success: true });
         } catch (error: any) {
-            this.errorHandler(error, res);
+            this._errorHandler(error, res);
         }
     }
 
-    async login({ body }: Request, res: Response, next: NextFunction): Promise<void> {
+    public async login({ body }: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const isUserValid = await this.users.validateUser(body);
             if (!isUserValid) {
@@ -56,11 +58,11 @@ export class UsersController extends BaseController implements IUsersController 
             const jwt = await this.users.signToken(body.email);
             res.status(200).json({ success: true, jwt });
         } catch (error: any) {
-            this.errorHandler(error, res);
+            this._errorHandler(error, res);
         }
     }
 
-    async info({ body }: Request, res: Response, next: NextFunction): Promise<void> {
+    public async info({ body }: Request, res: Response, next: NextFunction): Promise<void> {
         try {
             const user = await this.users.findByEmail(body.email);
             if (user) {
@@ -71,7 +73,7 @@ export class UsersController extends BaseController implements IUsersController 
                 throw new HTTPError404('User is not found');
             }
         } catch (error: any) {
-            this.errorHandler(error, res);
+            this._errorHandler(error, res);
         }
     }
 }
