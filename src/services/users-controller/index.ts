@@ -1,5 +1,5 @@
 import { HTTPError, HTTPError404, HTTPError422 } from '@errors/index';
-// import { AuthGuard } from '@middlewares/auth-guard';
+import { AuthGuard } from '@middlewares/auth-guard';
 import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
 import { IUsers } from '@services/users/types';
@@ -30,7 +30,7 @@ export class UsersController extends BaseController implements IUsersController 
                 path: '/',
                 func: this.info,
                 method: 'get',
-                // middlewares: [new AuthGuard()],
+                middlewares: [new AuthGuard()],
             },
         ]);
     }

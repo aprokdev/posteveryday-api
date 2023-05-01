@@ -1,9 +1,9 @@
+import { ErrorFilter } from '@middlewares/error-filter';
+import { IErrorFilter } from '@middlewares/error-filter/types';
 import { Database } from '@services/database';
 import { IDatabase } from '@services/database/types';
 import { ENVConfig } from '@services/env-config';
 import { IENVConfig } from '@services/env-config/types';
-import { ErrorFilter } from '@services/error-filter';
-import { IErrorFilter } from '@services/error-filter/types';
 import { LoggerService } from '@services/logger';
 import { ILogger } from '@services/logger/types';
 import { Posts } from '@services/posts';

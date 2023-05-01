@@ -1,7 +1,7 @@
+import { ILogger } from '@services/logger/types';
+import TYPES from '@src/inversify.types';
 import { Router } from 'express';
 import { inject, injectable } from 'inversify';
-import TYPES from '../../inversify.types';
-import { ILogger } from '../logger/types';
 import { IBaseController, Route } from './types';
 
 @injectable()

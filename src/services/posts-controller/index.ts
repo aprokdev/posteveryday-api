@@ -1,3 +1,4 @@
+import { AuthGuard } from '@middlewares/auth-guard';
 import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
 import { HTTPError } from '@src/errors';
@@ -19,6 +20,7 @@ export class PostsController extends BaseController implements IPostsController 
                 path: '/create',
                 func: this.create,
                 method: 'post',
+                middlewares: [new AuthGuard()],
             },
         ]);
     }

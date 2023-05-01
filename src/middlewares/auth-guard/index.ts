@@ -8,9 +8,11 @@ export class AuthGuard implements IMIddleware {
         res: Response,
         next: NextFunction,
     ): Promise<void> {
+        console.log('USER', user);
+
         if (user) {
             return next();
         }
-        res.status(401).send({ message: 'You are not authorized' });
+        res.status(401).send({ success: false, message: 'You are not authorized' });
     }
 }
