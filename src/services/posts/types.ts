@@ -1,4 +1,6 @@
-import { Request } from 'express';
+import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
+import { Post } from '@prisma/client';
+import { NextFunction, Request } from 'express';
 
 export interface IPostData {
     title: string;
@@ -11,12 +13,12 @@ export interface IPostData {
 }
 
 export interface IPosts {
-    create: (req: Request) => Promise<void>;
+    create: (req: IUserAuthInfoRequest) => Promise<Post>;
 }
 
 export interface IParseUploadResponse {
-    title?: string;
-    html?: string;
-    imageURL?: string;
+    title: string;
+    html: string;
+    imageURL: string;
     id?: string;
 }

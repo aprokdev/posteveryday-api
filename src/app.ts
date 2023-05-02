@@ -3,6 +3,7 @@ import { IErrorFilter } from '@middlewares/error-filter/types';
 import { IDatabase } from '@services/database/types';
 import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
+import { IPostsController } from '@services/posts-controller/types';
 import { IUsersController } from '@services/users-controller/types';
 import express from 'express';
 import { inject, injectable } from 'inversify';
@@ -17,6 +18,7 @@ export class App implements IApp {
         @inject(TYPES.ILogger) private _logger: ILogger,
         @inject(TYPES.IErrorFilter) private _errorFilter: IErrorFilter,
         @inject(TYPES.IUserController) private _userController: IUsersController,
+        @inject(TYPES.IPostsController) private _postsController: IPostsController,
         @inject(TYPES.IDatabase) private _db: IDatabase,
         @inject(TYPES.IENVConfig) private _env: IENVConfig,
     ) {
@@ -32,6 +34,7 @@ export class App implements IApp {
 
     private _applyControllers(): void {
         this._app.use('/users', this._userController.router);
+        this._app.use('/posts', this._postsController.router);
     }
 
     private _useExeptionFilters(): void {

@@ -31,7 +31,7 @@ InversifyContainer.bind<IUsers>(TYPES.IUsers).to(Users);
 InversifyContainer.bind<IDatabase>(TYPES.IDatabase).to(Database);
 InversifyContainer.bind<IENVConfig>(TYPES.IENVConfig).to(ENVConfig);
 InversifyContainer.bind<IPosts>(TYPES.IPosts).to(Posts);
-InversifyContainer.bind<IPostsController>(TYPES.IPosts).to(PostsController);
-InversifyContainer.bind<IS3Client>(TYPES.IPosts).to(S3Client);
+InversifyContainer.bind<IPostsController>(TYPES.IPostsController).to(PostsController);
+InversifyContainer.bind<IS3Client>(TYPES.IS3Client).to(S3Client);
 
 export default InversifyContainer;

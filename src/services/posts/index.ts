@@ -1,11 +1,14 @@
 import { Upload } from '@aws-sdk/lib-storage';
+import { HTTPError401 } from '@errors/index';
+import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
+import { Post } from '@prisma/client';
 import { IDatabase } from '@services/database/types';
 import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
 import busboy from 'busboy';
-import { Request } from 'express';
+import { NextFunction, Request } from 'express';
 import { inject, injectable } from 'inversify';
 import { IParseUploadResponse, IPostData, IPosts } from './types';
 
@@ -17,19 +20,29 @@ export class Posts implements IPosts {
         @inject(TYPES.IENVConfig) private _env: IENVConfig,
     ) {}
 
-    async create(req: Request): Promise<void> {
-        // const { title, html, imageURL: image } = await this._parseFieldsAndS3Upload(req);
-        // return await this._db.instance.post.create({
-        //     data: {
-        //         title,
-        //         html,
-        //         html_preview: html.slice(0, 340),
-        //         image,
-        //         // author_id: Number(session.id),
-        //         // author_firstname: session.first_name,
-        //         // author_lastname: session.last_name,
-        //     },
-        // });
+    async create(req: IUserAuthInfoRequest): Promise<Post> {
+        const { user } = req;
+        console.log(user);
+        if (user) {
+            const { id, first_name, last_name } = user;
+
+            const { title, html, imageURL } = await this._parseFieldsAndS3Upload(req);
+            console.log('DATA', { title, html, imageURL });
+
+            return await this._db.instance.post.create({
+                data: {
+                    title,
+                    html,
+                    html_preview: html.slice(0, 340),
+                    image: imageURL,
+                    author_id: Number(id),
+                    author_firstname: first_name,
+                    author_lastname: last_name,
+                },
+            });
+        } else {
+            throw new HTTPError401('You must be authorized to perform that action');
+        }
     }
 
     private _parseFieldsAndS3Upload(req: Request): Promise<IParseUploadResponse> {
@@ -38,7 +51,10 @@ export class Posts implements IPosts {
 
             let isFile = false;
 
-            const fields: any = {};
+            const fields: any = {
+                title: '',
+                html: '',
+            };
 
             bb.on('file', async (name, file, info) => {
                 isFile = true;
@@ -54,6 +70,10 @@ export class Posts implements IPosts {
 
                     const upload = new Upload({ client: this._s3.instance, params });
                     const { Location }: any = await upload.done();
+                    console.log('Location', Location);
+
+                    console.log('111', { imageURL: Location, ...fields });
+
                     res({ imageURL: Location, ...fields });
                 } catch (error) {
                     rej(error);
@@ -66,6 +86,8 @@ export class Posts implements IPosts {
 
             bb.on('finish', () => {
                 if (!isFile) {
+                    console.log('here');
+
                     res(fields);
                 }
                 if (isFile) {

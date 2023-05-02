@@ -1,4 +1,5 @@
 import { AuthGuard } from '@middlewares/auth-guard';
+import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
 import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
 import { HTTPError } from '@src/errors';
@@ -30,7 +31,11 @@ export class PostsController extends BaseController implements IPostsController 
         res.status(error?.status || 500).json({ success: false, message: error.message });
     }
 
-    public async create(req: Request, res: Response, next: NextFunction): Promise<void> {
+    public async create(
+        req: IUserAuthInfoRequest,
+        res: Response,
+        next: NextFunction,
+    ): Promise<void> {
         try {
             const post = await this.posts.create(req);
             res.status(201).json({ success: true, data: post });
