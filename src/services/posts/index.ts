@@ -59,15 +59,8 @@ export class Posts implements IPosts {
                 const { filename, mimeType } = info;
 
                 try {
-                    const params = {
-                        Bucket: this._env.get('AWS_S3_BUCKET_NAME'),
-                        Key: `images/${new Date().toISOString().replace(/\.||-/g, '')}-${filename}`,
-                        Body: file,
-                    };
-
-                    const upload = new Upload({ client: this._s3.instance, params });
-                    const { Location }: any = await upload.done();
-                    res({ imageURL: Location, ...fields });
+                    const imageURL = await this._s3.uploadImage(file, filename);
+                    res({ imageURL, ...fields });
                 } catch (error) {
                     rej(error);
                 }
