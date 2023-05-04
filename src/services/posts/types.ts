@@ -1,4 +1,4 @@
-import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
+import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { Post } from '@prisma/client';
 import { NextFunction, Request } from 'express';
 
@@ -13,7 +13,7 @@ export interface IPostData {
 }
 
 export interface IPosts {
-    create: (req: IUserAuthInfoRequest) => Promise<Post>;
+    create: (req: IRequestWithUser) => Promise<Post>;
 }
 
 export interface IParseUploadResponse {

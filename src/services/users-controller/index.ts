@@ -14,8 +14,14 @@ export class UsersController extends BaseController implements IUsersController 
         @inject(TYPES.ILogger) private _logger: ILogger,
         @inject(TYPES.IUsers) public users: IUsers,
     ) {
-        super(_logger);
+        super(_logger, 'users');
         this.bindRoutes([
+            {
+                path: '/',
+                func: this.info,
+                method: 'get',
+                middlewares: [new AuthGuard()],
+            },
             {
                 path: '/register',
                 func: this.register,
@@ -25,12 +31,6 @@ export class UsersController extends BaseController implements IUsersController 
                 path: '/login',
                 func: this.login,
                 method: 'post',
-            },
-            {
-                path: '/',
-                func: this.info,
-                method: 'get',
-                middlewares: [new AuthGuard()],
             },
         ]);
     }

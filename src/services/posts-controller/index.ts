@@ -1,10 +1,10 @@
 import { AuthGuard } from '@middlewares/auth-guard';
-import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
+import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
 import { HTTPError } from '@src/errors';
 import TYPES from '@src/inversify.types';
-import { NextFunction, Request, Response } from 'express';
+import { NextFunction, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { IPosts } from '../posts/types';
 import { IPostsController } from './types';
@@ -15,7 +15,7 @@ export class PostsController extends BaseController implements IPostsController 
         @inject(TYPES.ILogger) private _logger: ILogger,
         @inject(TYPES.IPosts) public posts: IPosts,
     ) {
-        super(_logger);
+        super(_logger, 'posts');
         this.bindRoutes([
             {
                 path: '/create',
@@ -31,11 +31,7 @@ export class PostsController extends BaseController implements IPostsController 
         res.status(error?.status || 500).json({ success: false, message: error.message });
     }
 
-    public async create(
-        req: IUserAuthInfoRequest,
-        res: Response,
-        next: NextFunction,
-    ): Promise<void> {
+    public async create(req: IRequestWithUser, res: Response, next: NextFunction): Promise<void> {
         try {
             const post = await this.posts.create(req);
             res.status(201).json({ success: true, data: post });

@@ -1,14 +1,13 @@
 import { Upload } from '@aws-sdk/lib-storage';
 import { HTTPError401 } from '@errors/index';
-import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
+import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { Post } from '@prisma/client';
 import { IDatabase } from '@services/database/types';
 import { IENVConfig } from '@services/env-config/types';
-import { ILogger } from '@services/logger/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
 import busboy from 'busboy';
-import { NextFunction, Request } from 'express';
+import { Request } from 'express';
 import { inject, injectable } from 'inversify';
 import { IParseUploadResponse, IPostData, IPosts } from './types';
 
@@ -20,14 +19,12 @@ export class Posts implements IPosts {
         @inject(TYPES.IENVConfig) private _env: IENVConfig,
     ) {}
 
-    async create(req: IUserAuthInfoRequest): Promise<Post> {
+    async create(req: IRequestWithUser): Promise<Post> {
         const { user } = req;
-        console.log(user);
         if (user) {
             const { id, first_name, last_name } = user;
 
             const { title, html, imageURL } = await this._parseFieldsAndS3Upload(req);
-            console.log('DATA', { title, html, imageURL });
 
             return await this._db.instance.post.create({
                 data: {
@@ -70,10 +67,6 @@ export class Posts implements IPosts {
 
                     const upload = new Upload({ client: this._s3.instance, params });
                     const { Location }: any = await upload.done();
-                    console.log('Location', Location);
-
-                    console.log('111', { imageURL: Location, ...fields });
-
                     res({ imageURL: Location, ...fields });
                 } catch (error) {
                     rej(error);
@@ -86,12 +79,7 @@ export class Posts implements IPosts {
 
             bb.on('finish', () => {
                 if (!isFile) {
-                    console.log('here');
-
                     res(fields);
-                }
-                if (isFile) {
-                    res({ imageURL: '', ...fields });
                 }
             });
 

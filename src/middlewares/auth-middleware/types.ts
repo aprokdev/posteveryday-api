@@ -1,6 +1,6 @@
 import { IUser } from '@services/users/types';
 import { Request } from 'express';
 
-export interface IUserAuthInfoRequest extends Request {
+export interface IRequestWithUser extends Request {
     user?: null | IUser;
 }

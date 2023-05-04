@@ -2,12 +2,12 @@ import { IDatabase } from '@services/database/types';
 import { NextFunction, Response } from 'express';
 import { verify } from 'jsonwebtoken';
 import { IMIddleware } from '../types';
-import { IUserAuthInfoRequest } from './types';
+import { IRequestWithUser } from './types';
 
 export class AuthMiddleware implements IMIddleware {
     constructor(private _secret: string, private _db: IDatabase) {}
 
-    public execute(req: IUserAuthInfoRequest, res: Response, next: NextFunction): void {
+    public execute(req: IRequestWithUser, res: Response, next: NextFunction): void {
         if (req.headers?.authorization) {
             // verifies authorization header 'Bearer ${token}'
             // if token ok, it returns user in payload in callback,

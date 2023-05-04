@@ -1,15 +1,13 @@
-import { IUserAuthInfoRequest } from '@middlewares/auth-middleware/types';
+import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { NextFunction, Request, Response } from 'express';
 import { IMIddleware } from '../types';
 
 export class AuthGuard implements IMIddleware {
     public async execute(
-        { user }: IUserAuthInfoRequest,
+        { user }: IRequestWithUser,
         res: Response,
         next: NextFunction,
     ): Promise<void> {
-        console.log('USER', user);
-
         if (user) {
             return next();
         }
