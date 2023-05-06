@@ -4,4 +4,6 @@ import { Readable } from 'stream';
 export interface IS3Client {
     instance: S3Client;
     uploadImage: (file: Readable, filename: string) => Promise<string>;
+    deleteS3File: (key: string) => Promise<boolean>;
+    getS3KeyFromLink: (link: string) => string;
 }

@@ -1,6 +1,6 @@
 import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { Post } from '@prisma/client';
-import { NextFunction, Request } from 'express';
+import { NextFunction, Response } from 'express';
 
 export interface IPostData {
     title: string;
@@ -12,8 +12,14 @@ export interface IPostData {
     author_lastname: string;
 }
 
+export interface IDeletePostParams {
+    id: string;
+    image: string;
+}
+
 export interface IPosts {
     create: (req: IRequestWithUser) => Promise<Post>;
+    delete: (params: IDeletePostParams) => Promise<boolean>;
 }
 
 export interface IParseUploadResponse {

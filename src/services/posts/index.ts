@@ -1,5 +1,5 @@
 import { Upload } from '@aws-sdk/lib-storage';
-import { HTTPError401 } from '@errors/index';
+import { HTTPError401, HTTPError404, HTTPError406 } from '@errors/index';
 import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { Post } from '@prisma/client';
 import { IDatabase } from '@services/database/types';
@@ -7,9 +7,9 @@ import { IENVConfig } from '@services/env-config/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
 import busboy from 'busboy';
-import { Request } from 'express';
+import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
-import { IParseUploadResponse, IPostData, IPosts } from './types';
+import { IDeletePostParams, IParseUploadResponse, IPostData, IPosts } from './types';
 
 @injectable()
 export class Posts implements IPosts {
@@ -21,25 +21,31 @@ export class Posts implements IPosts {
 
     async create(req: IRequestWithUser): Promise<Post> {
         const { user } = req;
-        if (user) {
-            const { id, first_name, last_name } = user;
+        if (!user) throw new HTTPError401('You should be authorized to perform that action');
 
-            const { title, html, imageURL } = await this._parseFieldsAndS3Upload(req);
+        const { id, first_name, last_name } = user;
+        const { title, html, imageURL } = await this._parseFieldsAndS3Upload(req);
 
-            return await this._db.instance.post.create({
-                data: {
-                    title,
-                    html,
-                    html_preview: html.slice(0, 340),
-                    image: imageURL,
-                    author_id: Number(id),
-                    author_firstname: first_name,
-                    author_lastname: last_name,
-                },
-            });
-        } else {
-            throw new HTTPError401('You must be authorized to perform that action');
-        }
+        return await this._db.instance.post.create({
+            data: {
+                title,
+                html,
+                html_preview: html.slice(0, 340),
+                image: imageURL,
+                author_id: Number(id),
+                author_firstname: first_name,
+                author_lastname: last_name,
+            },
+        });
+    }
+
+    async delete({ id, image }: IDeletePostParams): Promise<boolean> {
+        // delete image from S3 bucket before deleting post:
+        const key = this._s3.getS3KeyFromLink(image);
+        const isOk = await this._s3.deleteS3File(key);
+        console.log('S3 image has been deleted: ', isOk);
+        await this._db.instance.post.delete({ where: { id: Number(id) } });
+        return true;
     }
 
     private _parseFieldsAndS3Upload(req: Request): Promise<IParseUploadResponse> {

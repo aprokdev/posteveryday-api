@@ -2,7 +2,7 @@ import { AuthGuard } from '@middlewares/auth-guard';
 import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
-import { HTTPError } from '@src/errors';
+import { HTTPError, HTTPError406 } from '@src/errors';
 import TYPES from '@src/inversify.types';
 import { NextFunction, Response } from 'express';
 import { inject, injectable } from 'inversify';
@@ -13,7 +13,7 @@ import { IPostsController } from './types';
 export class PostsController extends BaseController implements IPostsController {
     constructor(
         @inject(TYPES.ILogger) private _logger: ILogger,
-        @inject(TYPES.IPosts) public posts: IPosts,
+        @inject(TYPES.IPosts) private _posts: IPosts,
     ) {
         super(_logger, 'posts');
         this.bindRoutes([
@@ -21,6 +21,12 @@ export class PostsController extends BaseController implements IPostsController 
                 path: '/create',
                 func: this.create,
                 method: 'post',
+                middlewares: [new AuthGuard()],
+            },
+            {
+                path: '/delete',
+                func: this.delete,
+                method: 'delete',
                 middlewares: [new AuthGuard()],
             },
         ]);
@@ -31,10 +37,32 @@ export class PostsController extends BaseController implements IPostsController 
         res.status(error?.status || 500).json({ success: false, message: error.message });
     }
 
-    public async create(req: IRequestWithUser, res: Response, next: NextFunction): Promise<void> {
+    public async create(req: IRequestWithUser, res: Response): Promise<void> {
         try {
-            const post = await this.posts.create(req);
+            const post = await this._posts.create(req);
             res.status(201).json({ success: true, data: post });
+        } catch (error: any) {
+            this._errorHandler(error, res);
+        }
+    }
+
+    public async delete(req: IRequestWithUser, res: Response): Promise<void> {
+        try {
+            const { image, id } = req.body;
+            if (image === undefined) {
+                throw new HTTPError406('image field is required');
+            }
+            if (id === undefined) {
+                throw new HTTPError406('id field is required');
+            }
+            if (image === '') {
+                throw new HTTPError406('image field can not be an empty string');
+            }
+            if (id === '') {
+                throw new HTTPError406('id field can not be an empty string');
+            }
+            await this._posts.delete({ id, image });
+            res.status(200).json({ success: true });
         } catch (error: any) {
             this._errorHandler(error, res);
         }
