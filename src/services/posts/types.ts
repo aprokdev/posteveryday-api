@@ -19,6 +19,7 @@ export interface IDeletePostParams {
 
 export interface IPosts {
     create: (req: IRequestWithUser) => Promise<Post>;
+    update: (req: IRequestWithUser) => Promise<Post>;
     delete: (params: IDeletePostParams) => Promise<boolean>;
 }
 

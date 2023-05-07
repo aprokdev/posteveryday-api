@@ -24,6 +24,12 @@ export class PostsController extends BaseController implements IPostsController 
                 middlewares: [new AuthGuard()],
             },
             {
+                path: '/update',
+                func: this.update,
+                method: 'put',
+                middlewares: [new AuthGuard()],
+            },
+            {
                 path: '/delete',
                 func: this.delete,
                 method: 'delete',
@@ -41,6 +47,15 @@ export class PostsController extends BaseController implements IPostsController 
         try {
             const post = await this._posts.create(req);
             res.status(201).json({ success: true, data: post });
+        } catch (error: any) {
+            this._errorHandler(error, res);
+        }
+    }
+
+    public async update(req: IRequestWithUser, res: Response): Promise<void> {
+        try {
+            const updated = await this._posts.update(req);
+            res.status(200).json({ success: true, data: updated });
         } catch (error: any) {
             this._errorHandler(error, res);
         }
