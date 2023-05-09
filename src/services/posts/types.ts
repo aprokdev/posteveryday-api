@@ -1,15 +1,15 @@
 import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { Post } from '@prisma/client';
-import { NextFunction, Response } from 'express';
 
 export interface IPostData {
     title: string;
-    html: string;
+    html?: string;
     html_preview: string;
     image: string;
     author_id: number;
     author_firstname: string;
     author_lastname: string;
+    created: string;
 }
 
 export interface IDeletePostParams {
@@ -17,9 +17,20 @@ export interface IDeletePostParams {
     image: string;
 }
 
+type queryParam = string;
+
+export interface IGetPostsParams {
+    offset: queryParam;
+    limit: queryParam;
+    author_id?: queryParam;
+    order?: queryParam;
+    order_field?: queryParam;
+}
+
 export interface IPosts {
     create: (req: IRequestWithUser) => Promise<Post>;
     update: (req: IRequestWithUser) => Promise<Post>;
+    getMany: (params: IGetPostsParams) => Promise<IPostData[]>;
     delete: (params: IDeletePostParams) => Promise<boolean>;
 }
 

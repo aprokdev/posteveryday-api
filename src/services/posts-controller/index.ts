@@ -4,7 +4,7 @@ import { BaseController } from '@services/base-controller';
 import { ILogger } from '@services/logger/types';
 import { HTTPError, HTTPError406 } from '@src/errors';
 import TYPES from '@src/inversify.types';
-import { NextFunction, Response } from 'express';
+import { Request, Response } from 'express';
 import { inject, injectable } from 'inversify';
 import { IPosts } from '../posts/types';
 import { IPostsController } from './types';
@@ -18,6 +18,11 @@ export class PostsController extends BaseController implements IPostsController 
         super(_logger, 'posts');
         this.bindRoutes([
             {
+                path: '/',
+                func: this.get,
+                method: 'get',
+            },
+            {
                 path: '/create',
                 func: this.create,
                 method: 'post',
@@ -29,6 +34,7 @@ export class PostsController extends BaseController implements IPostsController 
                 method: 'put',
                 middlewares: [new AuthGuard()],
             },
+
             {
                 path: '/delete',
                 func: this.delete,
@@ -78,6 +84,28 @@ export class PostsController extends BaseController implements IPostsController 
             }
             await this._posts.delete({ id, image });
             res.status(200).json({ success: true });
+        } catch (error: any) {
+            this._errorHandler(error, res);
+        }
+    }
+
+    public async get(req: Request, res: Response): Promise<void> {
+        try {
+            const offset = req.query.offset as string;
+            const limit = req.query.limit as string;
+            const author_id = req.query.author_id as string;
+            const order = req.query.order as string;
+            const order_field = req.query.order_field as string;
+
+            const list = await this._posts.getMany({
+                offset,
+                limit,
+                author_id,
+                order,
+                order_field,
+            });
+
+            res.status(200).json({ success: true, data: { list } });
         } catch (error: any) {
             this._errorHandler(error, res);
         }

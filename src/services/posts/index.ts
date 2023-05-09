@@ -4,10 +4,18 @@ import { Post } from '@prisma/client';
 import { IDatabase } from '@services/database/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
+import formatDateString from '@utils/formateDateString';
+import { feedModel } from '@utils/postDataFormat';
 import busboy from 'busboy';
 import { Request } from 'express';
 import { inject, injectable } from 'inversify';
-import { IDeletePostParams, IParseUploadResponse, IPosts } from './types';
+import {
+    IDeletePostParams,
+    IGetPostsParams,
+    IParseUploadResponse,
+    IPostData,
+    IPosts,
+} from './types';
 
 @injectable()
 export class Posts implements IPosts {
@@ -15,8 +23,9 @@ export class Posts implements IPosts {
         @inject(TYPES.IDatabase) private _db: IDatabase,
         @inject(TYPES.IS3Client) private _s3: IS3Client,
     ) {}
+    getPosts: (params: IGetPostsParams) => Promise<IPostData[]>;
 
-    async create(req: IRequestWithUser): Promise<Post> {
+    public async create(req: IRequestWithUser): Promise<Post> {
         const { user } = req;
         if (!user) throw new HTTPError401('You should be authorized to perform that action');
 
@@ -36,7 +45,7 @@ export class Posts implements IPosts {
         });
     }
 
-    async update(req: IRequestWithUser): Promise<Post> {
+    public async update(req: IRequestWithUser): Promise<Post> {
         const { user } = req;
         if (!user) throw new HTTPError401('You should be authorized to perform that action');
 
@@ -83,13 +92,35 @@ export class Posts implements IPosts {
         return updated;
     }
 
-    async delete({ id, image }: IDeletePostParams): Promise<boolean> {
+    public async delete({ id, image }: IDeletePostParams): Promise<boolean> {
         // delete image from S3 bucket before deleting post:
         const key = this._s3.getS3KeyFromLink(image);
         const isOk = await this._s3.deleteS3File(key);
         console.log('S3 image has been deleted: ', isOk);
         await this._db.instance.post.delete({ where: { id: Number(id) } });
         return true;
+    }
+
+    public async getMany({
+        offset,
+        limit,
+        author_id,
+        order,
+        order_field,
+    }: IGetPostsParams): Promise<IPostData[]> {
+        const posts = await this._db.instance.post.findMany({
+            take: Number(limit) || 0,
+            skip: Number(offset) || 0,
+            where: author_id ? { author_id: Number(author_id) } : undefined,
+            orderBy: {
+                [order_field ? `${order_field}` : 'created']: order || 'desc', // most recent by default
+            },
+            select: feedModel,
+        });
+        return posts.map((post) => ({
+            ...post,
+            created: formatDateString(post.created.toISOString()),
+        }));
     }
 
     private _parseFieldsAndS3Upload(req: Request): Promise<IParseUploadResponse> {
