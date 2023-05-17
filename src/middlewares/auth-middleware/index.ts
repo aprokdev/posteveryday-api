@@ -15,11 +15,13 @@ export class AuthMiddleware implements IMIddleware {
             verify(req.headers.authorization.split(' ')[1], this._secret, async (err, payload) => {
                 if (err) {
                     next();
-                } else if (typeof payload === 'string') {
+                } else if (typeof payload === 'object') {
                     const user = await this._db.instance.user.findUnique({
-                        where: { email: payload },
+                        where: { email: payload.email },
                     });
                     req.user = user;
+                    next();
+                } else {
                     next();
                 }
             });

@@ -48,7 +48,10 @@ export class Users implements IUsers {
         if (!secret) {
             throw new Error('TOKEN_SECRET is absent in .env file');
         } else {
-            return await sign(email, secret, { algorithm: 'HS256' });
+            return await sign({ email }, secret, {
+                algorithm: 'HS256',
+                expiresIn: '8h',
+            });
         }
     }
 }
