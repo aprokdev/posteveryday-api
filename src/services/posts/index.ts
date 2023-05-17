@@ -54,28 +54,32 @@ export class Posts implements IPosts {
         // ==== id field required in request! These 2 checks prevent undesirable behaviour
         // if image file was sent, it will be put in s3 anyways,
         // so after check we should remove it from bucket:
-        const isIdField = id !== 'undefined' && id !== '';
+        const isIdField = id !== 'undefined' && id !== '' && id !== undefined;
+
         if (!isIdField && imageURL) {
             const url = new URL(imageURL);
             const key = url.pathname.slice(1); // key: '/images/filename.jpg' => 'images/filename.jpg'
             const isOk = await this._s3.deleteS3File(key);
+
             throw new HTTPError422("'id' field is required");
         }
         if (!isIdField && !imageURL) {
             throw new HTTPError422("'id' field is required");
         }
+
+        if (!isIdField) {
+            throw new HTTPError422("'id' field is required");
+        }
         // ====
 
         // Don't forget to remove previous image from S3 bucket, if it had been passed
-        if (isIdField && imageURL) {
-            const previousPost = await this._db.instance.post.findFirst({
-                where: { id: Number(id) },
-            });
-            if (previousPost) {
-                const url = new URL(previousPost.image);
-                const key = url.pathname.slice(1); // key: '/images/filename.jpg' => 'images/filename.jpg'
-                const isOk = await this._s3.deleteS3File(key);
-            }
+        const previousPost = await this._db.instance.post.findFirst({
+            where: { id: Number(id) },
+        });
+        if (previousPost && imageURL) {
+            const key = this._s3.getS3KeyFromURL(previousPost.image);
+            const isOk = await this._s3.deleteS3File(key);
+            console.log('isOk', isOk);
         }
 
         const updated = await this._db.instance.post.update({
@@ -94,9 +98,8 @@ export class Posts implements IPosts {
 
     public async delete({ id, image }: IDeletePostParams): Promise<boolean> {
         // delete image from S3 bucket before deleting post:
-        const key = this._s3.getS3KeyFromLink(image);
+        const key = this._s3.getS3KeyFromURL(image);
         const isOk = await this._s3.deleteS3File(key);
-        console.log('S3 image has been deleted: ', isOk);
         await this._db.instance.post.delete({ where: { id: Number(id) } });
         return true;
     }

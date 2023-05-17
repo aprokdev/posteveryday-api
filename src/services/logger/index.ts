@@ -21,9 +21,14 @@ export class LoggerService implements ILogger {
             },
         });
     }
+    debug: (...args: unknown[]) => void;
 
     public info(...args: unknown[]): void {
         this._logger.info(...args);
+    }
+
+    public trace(...args: unknown[]): void {
+        this._logger.trace(...args);
     }
 
     public error(...args: unknown[]): void {

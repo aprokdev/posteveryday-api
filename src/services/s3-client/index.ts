@@ -1,6 +1,7 @@
 import { S3Client as Client } from '@aws-sdk/client-s3';
 import { DeleteObjectCommand } from '@aws-sdk/client-s3';
 import { Upload } from '@aws-sdk/lib-storage';
+import { ILogger } from '@services/logger/types';
 import TYPES from '@src/inversify.types';
 import { inject, injectable } from 'inversify';
 import { Readable } from 'stream';
@@ -10,7 +11,10 @@ import { IS3Client } from './types';
 @injectable()
 export class S3Client implements IS3Client {
     public instance: Client;
-    constructor(@inject(TYPES.IENVConfig) private _env: IENVConfig) {
+    constructor(
+        @inject(TYPES.IENVConfig) private _env: IENVConfig,
+        @inject(TYPES.ILogger) private _logger: ILogger,
+    ) {
         this.instance = new Client({
             region: 'ca-central-1',
             credentials: {
@@ -32,16 +36,25 @@ export class S3Client implements IS3Client {
     }
 
     public async deleteS3File(key: string): Promise<boolean> {
-        const command = new DeleteObjectCommand({
-            Bucket: this._env.get('AWS_S3_BUCKET_NAME'),
-            Key: key,
-        });
-        await this.instance.send(command);
-        return true;
+        // https://docs.aws.amazon.com/AmazonS3/latest/userguide/delete-objects.html
+        // https://docs.aws.amazon.com/AWSJavaScriptSDK/v3/latest/clients/client-s3/classes/deleteobjectcommand.html
+        try {
+            this._logger.info('deleting S3 key: ', key);
+            const command = new DeleteObjectCommand({
+                Bucket: this._env.get('AWS_S3_BUCKET_NAME'),
+                Key: key,
+            });
+            const result = await this.instance.send(command);
+            this._logger.trace('deleted S3 key: ', key);
+            return true;
+        } catch (error: any) {
+            this._logger.error(error);
+            return false;
+        }
     }
 
-    public getS3KeyFromLink(link: string): string {
-        const imageURL = new URL(link);
+    public getS3KeyFromURL(url: string): string {
+        const imageURL = new URL(url);
         return imageURL.pathname.slice(1); // key: '/images/filename.jpg' => 'images/filename.jpg'
     }
 }
