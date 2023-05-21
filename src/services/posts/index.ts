@@ -1,6 +1,5 @@
 import { HTTPError401, HTTPError422 } from '@errors/index';
 import { IRequestWithUser } from '@middlewares/auth-middleware/types';
-import { Post } from '@prisma/client';
 import { IDatabase } from '@services/database/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
@@ -25,14 +24,14 @@ export class Posts implements IPosts {
     ) {}
     getPosts: (params: IGetPostsParams) => Promise<IPostData[]>;
 
-    public async create(req: IRequestWithUser): Promise<Post> {
+    public async create(req: IRequestWithUser): Promise<IPostData> {
         const { user } = req;
         if (!user) throw new HTTPError401('You should be authorized to perform that action');
 
         const { id, first_name, last_name } = user;
         const { title, html, imageURL } = await this._parseFieldsAndS3Upload(req);
 
-        return await this._db.instance.post.create({
+        const post = await this._db.instance.post.create({
             data: {
                 title,
                 html,
@@ -43,9 +42,11 @@ export class Posts implements IPosts {
                 author_lastname: last_name,
             },
         });
+
+        return { ...post, created: formatDateString(post.created.toISOString()) };
     }
 
-    public async update(req: IRequestWithUser): Promise<Post> {
+    public async update(req: IRequestWithUser): Promise<IPostData> {
         const { user } = req;
         if (!user) throw new HTTPError401('You should be authorized to perform that action');
 
@@ -66,7 +67,6 @@ export class Posts implements IPosts {
         if (!isIdField && !imageURL) {
             throw new HTTPError422("'id' field is required");
         }
-
         if (!isIdField) {
             throw new HTTPError422("'id' field is required");
         }
@@ -93,7 +93,8 @@ export class Posts implements IPosts {
                 image: imageURL,
             },
         });
-        return updated;
+
+        return { ...updated, created: formatDateString(updated.created.toISOString()) };
     }
 
     public async delete({ id, image }: IDeletePostParams): Promise<boolean> {

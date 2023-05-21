@@ -28,8 +28,8 @@ export interface IGetPostsParams {
 }
 
 export interface IPosts {
-    create: (req: IRequestWithUser) => Promise<Post>;
-    update: (req: IRequestWithUser) => Promise<Post>;
+    create: (req: IRequestWithUser) => Promise<IPostData>;
+    update: (req: IRequestWithUser) => Promise<IPostData>;
     getMany: (params: IGetPostsParams) => Promise<IPostData[]>;
     delete: (params: IDeletePostParams) => Promise<boolean>;
 }
