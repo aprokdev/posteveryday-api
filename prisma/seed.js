@@ -4,7 +4,7 @@ import users from './users.json';
 
 const prisma = new PrismaClient();
 
-export async function main(): Promise<void> {
+export async function main() {
     console.log('[Elevator Music Cue] 🎸');
     for (const user of users) {
         await prisma.user.create({
