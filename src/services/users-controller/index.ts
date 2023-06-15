@@ -62,9 +62,13 @@ export class UsersController extends BaseController implements IUsersController 
         }
     }
 
-    public async info({ body }: Request, res: Response, next: NextFunction): Promise<void> {
+    public async info(req: Request, res: Response, next: NextFunction): Promise<void> {
         try {
-            const user = await this.users.findByEmail(body.email);
+            const email = req.query.email as string;
+            if (!email) {
+                throw new HTTPError422('"email" param is required');
+            }
+            const user = await this.users.findByEmail(email);
             if (user) {
                 const { hash, salt, ...rest } = user;
                 this.logger.info(rest);

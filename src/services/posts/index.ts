@@ -1,6 +1,7 @@
 import { HTTPError401, HTTPError422 } from '@errors/index';
 import { IRequestWithUser } from '@middlewares/auth-middleware/types';
 import { IDatabase } from '@services/database/types';
+import { ILogger } from '@services/logger/types';
 import { IS3Client } from '@services/s3-client/types';
 import TYPES from '@src/inversify.types';
 import formatDateString from '@utils/formateDateString';
@@ -21,6 +22,7 @@ export class Posts implements IPosts {
     constructor(
         @inject(TYPES.IDatabase) private _db: IDatabase,
         @inject(TYPES.IS3Client) private _s3: IS3Client,
+        @inject(TYPES.ILogger) private _logger: ILogger,
     ) {}
     getPosts: (params: IGetPostsParams) => Promise<IPostData[]>;
 
@@ -82,17 +84,21 @@ export class Posts implements IPosts {
             console.log('isOk', isOk);
         }
 
+        const data = {
+            title: title.length > 0 ? title : undefined,
+            html: html.length > 0 ? html : undefined,
+            html_preview: html.length > 0 ? html.slice(0, 340) : undefined,
+            image: imageURL,
+        };
+
         const updated = await this._db.instance.post.update({
             where: {
                 id: Number(id),
             },
-            data: {
-                title: title.length > 0 ? title : undefined,
-                html: html.length > 0 ? html : undefined,
-                html_preview: html.length > 0 ? html.slice(0, 340) : undefined,
-                image: imageURL,
-            },
+            data,
         });
+
+        this._logger.warn(`Update post[id=${id}] data: `, data);
 
         return { ...updated, created: formatDateString(updated.created.toISOString()) };
     }
@@ -105,13 +111,8 @@ export class Posts implements IPosts {
         return true;
     }
 
-    public async getMany({
-        offset,
-        limit,
-        author_id,
-        order,
-        order_field,
-    }: IGetPostsParams): Promise<IPostData[]> {
+    public async getMany(params: IGetPostsParams): Promise<IPostData[]> {
+        const { offset, limit, author_id, order, order_field } = params;
         const posts = await this._db.instance.post.findMany({
             take: Number(limit) || 0,
             skip: Number(offset) || 0,

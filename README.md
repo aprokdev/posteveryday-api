@@ -24,6 +24,10 @@
   <span>
   <img src="https://cdn.worldvectorlogo.com/logos/prisma-2.svg" style="width: 100px;" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
   </span>
+
+  <span>
+  <img src="https://www.citypng.com/public/uploads/preview/mysql-black-logo-transparent-background-11662225012tkocwlalne.png" style="width: 100px;" />&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  </span>
   
   <span>
   <img src="https://miro.medium.com/v2/resize:fit:788/0*Qdg5QbuCGOI7qzsF.png" style="width: 100px; padding-right: 20px;" />&nbsp;&nbsp;&nbsp;&nbsp;
@@ -58,23 +62,23 @@ npx prisma db seed
 
 Then you can run app in development mode by running ```npm run dev```
 
-To *build* production Javascript version of app run ```npm run build```. You might need additionally install tsc-alias package to make aliases work during build time, you can read [here](https://www.npmjs.com/package/tsc-alias)
+To *build* production Javascript version of app run ```npm run build```. You might need additionally install tsc-alias package to make aliases work during build time, you can read more about it [here](https://www.npmjs.com/package/tsc-alias). Builded files will be in the /dist folder in the project's root.
 
 ## Routes
 
-App contains following routes and corresponding methods:
+App contains following routes and corresponding methods under baseURL http://localhost:8000:
 
-'/users/' (GET) - to get user info. You should sent an email in request body
+'/users/' (GET) - to get user info. You should sent an "email" param in request
 
-'/users/register' (POST) - to create user. You should sent email, first_name, last_name, password fields in request body.
+'/users/register' (POST) - to create user. You should sent "email", "first_name", "last_name", "password" fields in request body.
 
-'/users/login' (POST) - to login user and get jwt. You should sent email and password fields in request body.
+'/users/login' (POST) - to login user and get jwt. You should sent "email" and "password" fields in request body.
 
-'/posts/' (GET) - to get list of posts. You can send offset, limit, author_id, order, order_field fields in request body.  'order' field value could be 'asc' or 'desc' (default), more here: https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#orderby.  'order_field' field value is a value by witch ordering will be done, default is 'created' field in post data (date of post creation)
+'/posts/' (GET) - to get list of posts. You can send "offset", "limit", "author_id", "order", "order_field" as query params according to PrismaORM <a href="https://www.prisma.io/docs/reference/api-reference/prisma-client-reference#orderby" target="_blank" rel="noreferer noopener">docs</a>. "order" param value could be "asc" or "desc" ("desc" is default). "order_field" param value is a value by witch ordering will be done, default is "created" field in post data (date of post creation)
 
 '/posts/create' (POST) - to create post. You should send string fields 'title', 'html' and image file in 'image' field. All fields are required. Use formdata for this request.
 
-'/posts/update' (PUT) - to update post. Use the same fields as in '/posts/create' request, but fields aren't required.
+'/posts/update' (PUT) - to update post. Use the same fields as in '/posts/create' request, but fields aren't required. Updated fields will be shown in the terminal.
 
 '/posts/delete' (DELETE) - to delete particular post. 'image' and 'id' fields are required. For 'image' field use image link from post data, to delete it from S3.
 
