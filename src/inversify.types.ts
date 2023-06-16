@@ -9,6 +9,7 @@ export const TYPES = {
     IPosts: Symbol('IPosts'),
     IPostsController: Symbol('IPostsController'),
     IS3Client: Symbol('IS3Client'),
+    IAuthMiddleware: Symbol('IAuthMiddleware'),
 };
 
 export default TYPES;

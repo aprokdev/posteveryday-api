@@ -1,7 +1,6 @@
-import { AuthMiddleware } from '@middlewares/auth-middleware';
 import { IErrorFilter } from '@middlewares/error-filter/types';
+import { IMIddleware } from '@middlewares/types';
 import { IDatabase } from '@services/database/types';
-import { IENVConfig } from '@services/env-config/types';
 import { ILogger } from '@services/logger/types';
 import { IPostsController } from '@services/posts-controller/types';
 import { IUsersController } from '@services/users-controller/types';
@@ -20,7 +19,7 @@ export class App implements IApp {
         @inject(TYPES.IUserController) private _userController: IUsersController,
         @inject(TYPES.IPostsController) private _postsController: IPostsController,
         @inject(TYPES.IDatabase) private _db: IDatabase,
-        @inject(TYPES.IENVConfig) private _env: IENVConfig,
+        @inject(TYPES.IAuthMiddleware) private _authMiddleware: IMIddleware,
     ) {
         this._app = express();
         this._port = 8000;
@@ -28,8 +27,7 @@ export class App implements IApp {
 
     private _applyMiddlewares(): void {
         this._app.use(express.json());
-        const authMiddleware = new AuthMiddleware(this._env.get('TOKEN_SECRET'), this._db);
-        this._app.use(authMiddleware.execute.bind(authMiddleware));
+        this._app.use(this._authMiddleware.execute.bind(this._authMiddleware));
     }
 
     private _applyControllers(): void {

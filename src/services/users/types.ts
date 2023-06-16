@@ -1,4 +1,5 @@
 import { User } from '@prisma/client';
+import type { JwtPayload } from 'jsonwebtoken';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
 
 export interface IUsers {
@@ -6,6 +7,7 @@ export interface IUsers {
     create: (user: UserRegisterDTO) => Promise<IUser>;
     validateUser: (user: UserLoginDTO) => Promise<boolean>;
     signToken: (email: string) => Promise<string>;
+    verifyToken: (token: string) => Promise<string>;
 }
 
 export interface IRegisterUserBody {

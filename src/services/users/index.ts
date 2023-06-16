@@ -5,7 +5,8 @@ import { validatePassword } from '@services/users/user-entity';
 import { UserEntity } from '@services/users/user-entity';
 import TYPES from '@src/inversify.types';
 import { inject, injectable } from 'inversify';
-import { sign } from 'jsonwebtoken';
+import { sign, verify } from 'jsonwebtoken';
+import type { JwtPayload } from 'jsonwebtoken';
 import { UserLoginDTO, UserRegisterDTO } from './dto';
 import { IUser, IUsers } from './types';
 
@@ -53,5 +54,20 @@ export class Users implements IUsers {
                 expiresIn: '8h',
             });
         }
+    }
+
+    public verifyToken(token: string): Promise<string> {
+        const secret = this._env.get('TOKEN_SECRET');
+        return new Promise((res, rej) => {
+            verify(token, secret, async (err, payload) => {
+                if (err) {
+                    rej(err);
+                } else if (typeof payload === 'object') {
+                    res(payload.email);
+                } else {
+                    rej(new Error('[users] verifyToken error: Unknown error'));
+                }
+            });
+        });
     }
 }

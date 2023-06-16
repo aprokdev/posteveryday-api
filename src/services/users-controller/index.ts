@@ -71,7 +71,7 @@ export class UsersController extends BaseController implements IUsersController 
             const user = await this.users.findByEmail(email);
             if (user) {
                 const { hash, salt, ...rest } = user;
-                this.logger.info(rest);
+                this.logger.trace(`[/users?email="${email}"]`, rest);
                 res.json(rest);
             } else {
                 throw new HTTPError404('User is not found');
