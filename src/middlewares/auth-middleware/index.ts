@@ -1,5 +1,5 @@
+import { IAuth } from '@services/auth/types';
 import { IDatabase } from '@services/database/types';
-import { IUsers } from '@services/users/types';
 import TYPES from '@src/inversify.types';
 import { NextFunction, Response } from 'express';
 import { inject, injectable } from 'inversify';
@@ -9,7 +9,7 @@ import { IRequestWithUser } from './types';
 @injectable()
 export class AuthMiddleware implements IMIddleware {
     constructor(
-        @inject(TYPES.IUsers) private _users: IUsers,
+        @inject(TYPES.IAuth) private _auth: IAuth,
         @inject(TYPES.IDatabase) private _db: IDatabase,
     ) {}
 
@@ -19,9 +19,7 @@ export class AuthMiddleware implements IMIddleware {
             // if token ok, it returns users email in callback,
             // then AuthGuard on root level checks if request pass further or not
             try {
-                const email = await this._users.verifyToken(
-                    req.headers.authorization.split(' ')[1],
-                );
+                const email = await this._auth.verifyToken(req.headers.authorization.split(' ')[1]);
                 if (email) {
                     const user = await this._db.instance.user.findUnique({
                         where: { email: email },

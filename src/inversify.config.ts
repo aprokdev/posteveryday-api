@@ -2,6 +2,8 @@ import { AuthMiddleware } from '@middlewares/auth-middleware';
 import { ErrorFilter } from '@middlewares/error-filter';
 import { IErrorFilter } from '@middlewares/error-filter/types';
 import { IMIddleware } from '@middlewares/types';
+import { Auth } from '@services/auth';
+import { IAuth } from '@services/auth/types';
 import { Database } from '@services/database';
 import { IDatabase } from '@services/database/types';
 import { ENVConfig } from '@services/env-config';
@@ -35,6 +37,7 @@ InversifyContainer.bind<IENVConfig>(TYPES.IENVConfig).to(ENVConfig);
 InversifyContainer.bind<IPosts>(TYPES.IPosts).to(Posts);
 InversifyContainer.bind<IPostsController>(TYPES.IPostsController).to(PostsController);
 InversifyContainer.bind<IS3Client>(TYPES.IS3Client).to(S3Client);
+InversifyContainer.bind<IAuth>(TYPES.IAuth).to(Auth);
 InversifyContainer.bind<IMIddleware>(TYPES.IAuthMiddleware).to(AuthMiddleware);
 
 export default InversifyContainer;
