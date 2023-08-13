@@ -64,6 +64,8 @@ Then you can run app in development mode by running ```npm run dev```
 
 To *build* production Javascript version of app run ```npm run build```. You might need additionally install tsc-alias package to make aliases work during build time, you can read more about it [here](https://www.npmjs.com/package/tsc-alias). Builded files will be in the /dist folder in the project's root.
 
+To run production version run ```npm start```
+
 ## Routes
 
 App contains following routes and corresponding methods under baseURL http://localhost:8000:

@@ -1,6 +1,5 @@
 import { HTTPError422 } from '@errors/index';
 import { IDatabase } from '@services/database/types';
-import { IENVConfig } from '@services/env-config/types';
 import { validatePassword } from '@services/users/user-entity';
 import { UserEntity } from '@services/users/user-entity';
 import TYPES from '@src/inversify.types';
@@ -10,10 +9,7 @@ import { IUser, IUsers } from './types';
 
 @injectable()
 export class Users implements IUsers {
-    constructor(
-        @inject(TYPES.IDatabase) private _db: IDatabase,
-        @inject(TYPES.IENVConfig) private _env: IENVConfig,
-    ) {}
+    constructor(@inject(TYPES.IDatabase) private _db: IDatabase) {}
     signToken: (email: string) => Promise<string>;
 
     public async findByEmail(email: string): Promise<IUser | null> {
