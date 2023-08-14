@@ -6,6 +6,8 @@ import { IPostsController } from '@services/posts-controller/types';
 import { IUsersController } from '@services/users-controller/types';
 import express from 'express';
 import { inject, injectable } from 'inversify';
+import swaggerUi from 'swagger-ui-express';
+import swaggerJSON from '../swagger3.json';
 import TYPES from './inversify.types';
 import { IApp } from './types';
 
@@ -33,6 +35,7 @@ export class App implements IApp {
     private _applyControllers(): void {
         this._app.use('/users', this._userController.router);
         this._app.use('/posts', this._postsController.router);
+        this._app.use('/docs', swaggerUi.serve, swaggerUi.setup(swaggerJSON));
     }
 
     private _useExeptionFilters(): void {

@@ -1,0 +1,593 @@
+{
+    "openapi": "3.0.0",
+    "info": {
+      "title": "Users service",
+      "description": "REST API Service for creating, storing and authenticating users. First login, then put access_token to Authentication to make accesible protected routes",
+      "version": "1.0.0"
+    },
+    "servers": [
+      {
+        "url": "http://localhost:8000",
+        "description": "local development server"
+      }
+    ],
+    "security": [
+      {
+        "bearerAuth": []
+      }
+    ],
+    "paths": {
+      "/users/register": {
+        "post": {
+          "tags": ["Users"],
+          "description": "Register new user",
+          "summary": "Register new user",
+          "operationId": "registerUser",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserRegister"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserRegisterSuccess"
+                  }
+                }
+              }
+            },
+            "422": {
+              "description": "Useer already exist",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserRegisterUserExist"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/users/login": {
+        "post": {
+          "tags": ["Users"],
+          "description": "Provides UserCredentials to make requests to this API",
+          "summary": "Login user",
+          "operationId": "loginUser",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserCredentials"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserLoginSuccess"
+                  }
+                }
+              }
+            },
+            "422": {
+                "description": "Wrong credentials response",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/UserLoginWrongCredentials"
+                    }
+                  }
+                }
+            }
+          }
+        }
+      },
+      "/users": {
+        "get": {
+          "tags": ["Users"],
+          "description": "Get user data by email [PROTECTED]",
+          "summary": "Get user data by email [PROTECTED]",
+          "operationId": "getUser",
+          "parameters": [
+            {
+              "name": "email",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/UserEmail"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserData"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedRequest"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/posts": {
+        "get": {
+          "tags": ["Posts"],
+          "description": "Get posts by requested parameters",
+          "summary": "Get posts by requested parameters",
+          "operationId": "getPosts",
+          "parameters": [
+            {
+              "name": "offset",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/GetPostsParams"
+              }              
+            },
+            {
+              "name": "limit",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/GetPostsParams"
+              }
+            },
+            {
+              "name": "author_id",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/GetPostsParams"
+              }
+            },
+            {
+              "name": "order",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/GetPostsParams"
+              }
+            },
+            {
+              "name": "order_field",
+              "in": "query",
+              "required": true,
+              "schema": {
+                "$ref": "#/components/schemas/GetPostsParams"
+              }
+            }
+          ],
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UserData"
+                  }
+                }
+              }
+            },
+            "401": {
+              "description": "Unauthorized response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/UnauthorizedRequest"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "/posts/create": {
+        "post": {
+          "tags": ["Posts"],
+          "description": "Create post [PROTECTED]",
+          "summary": "Create post [PROTECTED]",
+          "operationId": "createPost",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostData"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessPostOperation"
+                  }
+                }
+              }
+            },
+            "422": {
+                "description": "Wrong credentials response",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/UserLoginWrongCredentials"
+                    }
+                  }
+                }
+            }
+          }
+        }
+      },
+      "/posts/update": {
+        "put": {
+          "tags": ["Posts"],
+          "description": "Update post [PROTECTED]",
+          "summary": "Update post [PROTECTED]",
+          "operationId": "updatePost",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostData"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessPostOperation"
+                  }
+                }
+              }
+            },
+            "422": {
+                "description": "Wrong credentials response",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/UserLoginWrongCredentials"
+                    }
+                  }
+                }
+            }
+          }
+        }
+      },
+      "/posts/delete": {
+        "delete": {
+          "tags": ["Posts"],
+          "description": "Delete post [PROTECTED]",
+          "summary": "Delete post [PROTECTED]",
+          "operationId": "deletePost",
+          "requestBody": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PostData"
+                }
+              }
+            }
+          },
+          "responses": {
+            "200": {
+              "description": "Success response",
+              "content": {
+                "application/json": {
+                  "schema": {
+                    "$ref": "#/components/schemas/SuccessPostOperation"
+                  }
+                }
+              }
+            },
+            "422": {
+                "description": "Wrong credentials response",
+                "content": {
+                  "application/json": {
+                    "schema": {
+                      "$ref": "#/components/schemas/UserLoginWrongCredentials"
+                    }
+                  }
+                }
+            }
+          }
+        }
+      }
+    },
+    "components": {
+      "schemas": {
+        "UserLoginSuccess": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": true
+            },
+            "access_token": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5kb2VAZ21haWwuY29tIiwiaWF0IjoxNjg3NTY2NDAzLCJleHAiOjE2ODc1NjcwMDN9.KAbmo5Hxmt4OeUEn1P6VdSbdbKdKq-ZdAKN28El3nKs"
+            },
+            "at_expires_at": {
+              "type": "number",
+              "example": 1687567003493
+            }
+          }
+        },
+        "UserRegisterSuccess": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        },
+        "UserLoginWrongCredentials": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "Provided credentials are invalid"
+            }
+          }
+        },
+        "UserCredentials": {
+          "type": "object",
+          "required": [
+            "email", "password"
+          ],
+          "properties": {
+            "email": {
+              "type": "string",
+              "example": "johndoe@gmail.com"
+            },
+            "password": {
+              "type": "string",
+              "example": "123123"
+            }
+          }
+        },
+        "UserRegister": {
+          "type": "object",
+          "required": [
+            "first_name", "last_name", "email", "password"
+          ],
+          "properties": {
+            "email": {
+              "type": "string",
+              "example": "janedoe@gmail.com"
+            },
+            "first_name": {
+              "type": "string",
+              "example": "Jane"
+            },
+            "last_name": {
+              "type": "string",
+              "example": "Doe"
+            },
+            "password": {
+              "type": "string",
+              "example": "123123"
+            }
+          }
+        },
+        "UserUpdate": {
+          "type": "object",
+          "required": [ "email" ],
+          "properties": {
+            "email": {
+              "type": "string",
+              "example": "janedoe@gmail.com"
+            },
+            "first_name": {
+              "type": "string",
+              "example": "Karen"
+            },
+            "last_name": {
+              "type": "string",
+              "example": "Doe"
+            },
+            "password": {
+              "type": "string",
+              "example": "111222"
+            }
+          }
+        },
+        "UserRegisterUserExist": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "User with provided email is already exist"
+            }
+          }
+        },
+        "UserData": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": true
+            },
+            "user": {
+              "type": "object",
+              "example": {
+                "email": {
+                  "type": "string",
+                  "example": "janedoe@gmail.com"
+                },
+                "first_name": {
+                  "type": "string",
+                  "example": "Jane"
+                },
+                "last_name": {
+                  "type": "string",
+                  "example": "Doe"
+                },
+                "id": {
+                  "type": "number",
+                  "example": 2
+                },
+                "role": {
+                  "type": "string",
+                  "example": "admin"
+                },
+                "image": {
+                  "type": "string",
+                  "example": ""
+                }
+              }
+            }
+            
+          }
+        },
+        "RefreshTokenSuccess": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": true
+            },
+            "access_token": {
+              "type": "string",
+              "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJlbWFpbCI6ImpvaG5kb2VAZ21haWwuY29t.44fGKQB1mb39bvbaxLt4b40vJnPSxeX9G3iKbyeXBGQ"
+            }
+          }
+        },
+        "UnauthorizedRequest": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": false
+            },
+            "message": {
+              "type": "string",
+              "example": "You are not authorized"
+            }
+          }
+        },
+        "AuthRefreshToken": {
+          "type": "string"
+        },
+        "UserEmail": {
+          "type": "string"
+        },
+        "UserDeleteSuccess": {
+          "type": "object",
+          "properties": {
+            "success": {
+              "type": "boolean",
+              "example": true
+            }
+          }
+        },
+        "PostData": {
+          "type": "object",
+          "required": [
+            "title", "html", "image"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "example": "Test post title"
+            },
+            "html": {
+              "type": "string",
+              "example": "Test text string"
+            },
+            "image": {
+              "type": "string",
+              "example": "Test text string"
+            }
+          }
+        },
+        "SuccessPostOperation": {
+          "type": "object",
+          "required": [
+            "title", "html", "image", "html_preview", "author_id", "author_firstname", "author_lastname"
+          ],
+          "properties": {
+            "title": {
+              "type": "string",
+              "example": "Test post title"
+            },
+            "html": {
+              "type": "string",
+              "example": "Test text string"
+            },
+            "html_preview": {
+              "type": "string",
+              "example": "Test text str..."
+            },
+            "image": {
+              "type": "string",
+              "example": "Test text string"
+            },
+            "author_id": {
+              "type": "number",
+              "example": 1
+            },
+            "author_firstname": {
+              "type": "string",
+              "example": "Jack"
+            },
+            "author_lastname": {
+              "type": "string",
+              "example": "Jackson"
+            }
+          }
+        },
+        "GetPostsParams": {
+          "type": "string"
+        }
+      },
+      "securitySchemes": {
+        "bearerAuth": {
+          "type": "http",
+          "name": "authorization",
+          "scheme": "bearer",
+          "bearerFormat": "JWT"
+        }
+      }
+    }
+  }
